@@ -1,12 +1,7 @@
 import pygame
 import math
 from pygame.constants import *
-from constants import *
-
-
-pygame.init()
-wind = 0
-is_working = True
+from locals import *
 
 
 class Thing:
@@ -39,7 +34,7 @@ class Thing:
 
 class Gook(Thing):
     def __init__(self, pos, team):
-        super().__init__(pos, gook_img, gook_res)
+        super().__init__(pos, GOOK_IMG, GOOK_RES)
         self.team = team
         self.movement = 100
 
@@ -53,30 +48,55 @@ class Gook(Thing):
 
 class Projectile(Thing):
     def __init__(self, pos, weapon, angle, speed):
-        super().__init__(pos, projectiles[weapon][0], projectiles[weapon][1])
-        self.g = projectiles[weapon][2]
+        super().__init__(pos, PROJECTILES[weapon][0], PROJECTILES[weapon][1])
+        self.g = PROJECTILES[weapon][2]
         self.speed_x = speed * math.cos(angle) + wind
         self.speed_y = speed * math.sin(angle)
 
     def move(self):
         super().move(self.speed_x, self.speed_y)
-        self.speed_y -= g
+        self.speed_y -= self.g * 10
+
+
+class Background(Thing):
+    def __init__(self):
+        super().__init__((0, 0), BACKGROUND_IMG, RESOLUTION)
+
+
+pygame.init()
+window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
+pygame.display.set_caption('Gooks')
+background = Background()
+
+# Создание гуков
+gooks = []
+for team in TEAMS:
+    for i in range(N_GOOKS):
+        gooks.append(Gook((200 + i * 50, 200 + i * 50), team))
 
 
 while is_working:
     for event in pygame.event.get():
         if event.type == QUIT:
-            working = False
+            is_working = False
         if event.type == KEYDOWN:
             if event.key == K_F1:
                 if fullscreen:
-                    window: pygame.Surface = pygame.display.set_mode(resolution)
+                    window: pygame.Surface = pygame.display.set_mode(RESOLUTION)
                     fullscreen = False
                 else:
-                    window: pygame.Surface = pygame.display.set_mode(resolution, FULLSCREEN)
+                    window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
                     fullscreen = True
             if event.key == K_ESCAPE:
-                working = False
+                is_working = False
+    background.draw()
+
+    for gook in gooks:
+        gook.draw()
+
+    if is_shot:
+        shot.move()
+
 
 
 
