@@ -4,6 +4,24 @@ from pygame.constants import *
 from locals import *
 
 
+def get_next_team():
+    while True:
+        for team_now in TEAMS:
+            yield team_now
+
+
+def get_next_gook(team_now):
+    while True:
+        for gook_now in team_now:
+            yield gook_now
+
+
+def next_turn():
+    global team, gook
+    team = next(get_next_team())
+    gook = next(get_next_gook(team))
+
+
 class Thing:
     def __init__(self, pos, image, res):
         self.position = pos
@@ -46,7 +64,7 @@ class Gook(Thing):
         self.movement -= x
 
 
-class Projectile(Thing):
+class Shot(Thing):
     def __init__(self, pos, weapon, angle, speed):
         super().__init__(pos, PROJECTILES[weapon][0], PROJECTILES[weapon][1])
         self.g = PROJECTILES[weapon][2]
@@ -71,9 +89,8 @@ background = Background()
 # Создание гуков
 gooks = []
 for team in TEAMS:
-    for i in range(N_GOOKS):
-        gooks.append(Gook((200 + i * 50, 200 + i * 50), team))
-
+    for n in range(N_GOOKS):
+        gooks.append(Gook((200 + n * 50, 200 + n * 50), team))
 
 while is_working:
     for event in pygame.event.get():
@@ -89,14 +106,21 @@ while is_working:
                     fullscreen = True
             if event.key == K_ESCAPE:
                 is_working = False
+            if event.key == K_SPACE:
+                if not is_shot:
+                    shot = Shot()
     background.draw()
 
     for gook in gooks:
         gook.draw()
 
     if is_shot:
+        shot.draw()
         shot.move()
-
-
-
-
+        if shot.check_boom():
+            shot.boom()
+            is_shot = False
+            del shot
+            next_turn()
+        else:
+            shot.draw()

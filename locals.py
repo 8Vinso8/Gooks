@@ -37,7 +37,9 @@ WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
            'grenade': (GRENADE_IMG, GRENADE_RES),
            'laser': (LASER_IMG, LASER_RES)}
 
-TEAMS = ['red', 'blue', 'green']
+TEAMS = [['ChiMin', 'ChinGook', 'Tahyon'],
+         ['KimChenIn', 'KimChenIr', 'KimIrSen'],
+         ['Hidetaka', 'Hayao', 'Kodjima']]
 N_GOOKS = 1
 
 wind = 0
