@@ -17,3 +17,8 @@ class Map:
         for i in range(start[0], start[0] + size[0]):
             for j in range(start[1], start[1] + size[1]):
                 window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.color_zero) # Поменять цвета местами если баги
+
+    def explode(self, point, size):
+        for i in range(point[0] - size, point[0] + size):
+            for j in range(point[1] - size, point[1] + size):
+                self.bitmap[j][i] = 0
