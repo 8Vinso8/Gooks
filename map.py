@@ -11,7 +11,7 @@ class Map:
     def load_map_file(self, map_file):
         with open(map_file, 'r') as f:
             for line in f.readlines():
-                self.bitmap.append(line)
+                self.bitmap.append(list(map(lambda x: int(x), list(line)))
 
     def draw_part(self, window, start, size):
         for i in range(start[0], start[0] + size[0]):
