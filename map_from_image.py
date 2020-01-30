@@ -1,7 +1,7 @@
 from PIL import Image
 try:
     im = Image.open("map.jpg")
-except:
+except FileNotFoundError:
     im = Image.open('map.png')
 f = open('map.txt', mode='w')
 pixels = im.load()

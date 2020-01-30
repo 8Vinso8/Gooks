@@ -9,14 +9,20 @@ pygame.display.set_caption('Gooks')
 is_working = True
 pl_pos = (900, 500)
 pl_size = 100
+
+
 def place_to_update():
     pass
+
+
 def collision(pos):
     for i in range(pos[0], pos[0] + pl_size):
         for j in range(pos[1], pos[1] + pl_size):
             if map[j][i]:
                 return True
     return False
+
+
 for i in range(1920):
     for j in range(1080):
         window.set_at((i, j), (0, 255, 0) if map[j][i] else (0, 0, 0))

@@ -1,7 +1,7 @@
 BACKGROUND_IMG = 'background.png'
 RESOLUTION = 1920, 1080
 
-GOOK_IMG = 'gook.png'
+GOOK_IMG = 'wait.png'
 GOOK_RES = (200, 200)
 MOVE1_IMG = 'move1.png'
 MOVE1_RES = (200, 200)
@@ -40,9 +40,13 @@ WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
 TEAMS = [['ChiMin', 'ChinGook', 'Tahyon'],
          ['KimChenIn', 'KimChenIr', 'KimIrSen'],
          ['Hidetaka', 'Hayao', 'Kodjima']]
-N_GOOKS = 1
+TEAM_LEN = len(TEAMS[0])
 
 wind = 0
+
+POSITIONS = [(100, 400), (200, 400), (300, 400),
+             (400, 400), (500, 400), (600, 400),
+             (700, 400), (800, 400), (900, 400)]
 
 is_working = True
 fullscreen = True
