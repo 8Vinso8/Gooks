@@ -6,7 +6,6 @@ except:
 f = open('map.txt', mode='w')
 pixels = im.load()
 x, y = im.size
-print(x, y)
 current_line = ''
 for i in range(y):
     for j in range(x):
