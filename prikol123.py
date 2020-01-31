@@ -19,3 +19,4 @@ def collision(self, direction):
             for j in range(self.pos[1] + self.pl_size + 1, self.pos[1] + self.pl_size + 3):
                 if map[j][i]:
                     return True
+    return False
