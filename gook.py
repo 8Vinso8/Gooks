@@ -12,6 +12,14 @@ class Gook:
         self.y_speed = 0
         self.speed_decrease = 5  # Замедление
 
+        self.last_pos = position  # Для оптимизации отрисовки битмапа
+
+    def get_size(self):
+        return self.size
+
+    def get_last_pos(self):
+        return self.last_pos
+
     def change_image(self, image):
         self.cur_image = image
 
@@ -25,7 +33,12 @@ class Gook:
     def get_pos(self):
         return self.position
 
+    def key_move(self, move):
+        pass  # Списать коллизию из пассивного мува
+
     def passive_move(self):
+            changed = False
+            last_pos = self.position
             if self.x_speed:
                 if self.x_speed > 0:
                     if collision(self, 'right'):
@@ -35,6 +48,7 @@ class Gook:
                         self.x_speed -= self.speed_decrease
                         if self.x_speed < 0:
                             self.x_speed = 0
+                            changed = True
                 else:
                         if collision(self, 'left'):
                             self.x_speed = 0
@@ -43,6 +57,7 @@ class Gook:
                             self.x_speed += self.speed_decrease
                             if self.x_speed > 0:
                                 self.x_speed = 0
+                            changed = True
 
             if self.y_speed:
                 if self.y_speed > 0:
@@ -53,6 +68,7 @@ class Gook:
                         self.y_speed -= self.speed_decrease
                         if self.y_speed < 0:
                             self.y_speed = 0
+                        changed = True
                 else:
                         if collision(self, 'up'):
                             self.y_speed = 0
@@ -61,6 +77,11 @@ class Gook:
                             self.y_speed += self.speed_decrease
                             if self.y_speed > 0:
                                 self.y_speed = 0
+                        changed = True
+
+            if changed:
+                self.last_pos = last_pos
+
 
 def collision(self, direction):
     if direction == 'left':
