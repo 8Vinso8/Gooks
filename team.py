@@ -8,5 +8,5 @@ class Team:
     def get_gook(self, n):
         return self.gooks[n % len(self.gooks)] if self.gooks else None
 
-    def get_gook(self):
+    def get_gooks(self):
         return self.gooks
