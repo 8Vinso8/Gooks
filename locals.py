@@ -37,12 +37,20 @@ WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
            'grenade': (GRENADE_IMG, GRENADE_RES),
            'laser': (LASER_IMG, LASER_RES)}
 
-TEAMS = [['ChiMin', 'ChinGook', 'Tahyon'],
-         ['KimChenIn', 'KimChenIr', 'KimIrSen'],
-         ['Hidetaka', 'Hayao', 'Kodjima']]
-TEAM_LEN = len(TEAMS[0])
+TEAMS = [['BTS', 'BLUE', [(0, 0), (0, 500), (0, 1000)], ('ChiMin', 'ChinGook', 'Tahyon')],
+         ['CHUCHE', 'RED', [(500, 0), (500, 500), (500, 1000)], ('KimChenIn', 'KimChenIr', 'KimIrSen')],
+         ['ANIME', 'WHITE', [(1000, 0), (1000, 500), (1000, 1000)], ('Hidetaka', 'Hayao', 'Kodjima')]]
+
+TEAM_LEN = len(TEAMS[0][3])
+
+G = 10
 
 wind = 0
+moved_gooks = []
+bullets = []
+teams = []
+cur_gook = None
+cur_team = None
 
 POSITIONS = [(100, 400), (200, 400), (300, 400),
              (400, 400), (500, 400), (600, 400),

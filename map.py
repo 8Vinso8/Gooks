@@ -1,6 +1,3 @@
-import pygame
-
-
 class Map:
     def __init__(self, map_file, positions, color_zero, color_one):
         self.bitmap = list()

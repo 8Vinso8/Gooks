@@ -6,4 +6,7 @@ class Team:
         self.team_name = team_name
 
     def get_gook(self, n):
-        return self.gooks[n // len(self.gooks)] if self.gooks else None
+        return self.gooks[n % len(self.gooks)] if self.gooks else None
+
+    def get_gook(self):
+        return self.gooks

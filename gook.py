@@ -34,75 +34,93 @@ class Gook:
         return self.position
 
     def key_move(self, move):
-        pass  # Списать коллизию из пассивного мува
+        self.last_pos = self.position
+        if move == 'D':
+            self.x_speed = 5
+        else:
+            self.x_speed = -5
+
+        if self.x_speed > 0:
+            if collision(self, 'right'):
+                self.x_speed = 0
+            else:
+                self.position = self.position[0] + self.x_speed, self.position[1]
+        else:
+            if collision(self, 'left'):
+                self.x_speed = 0
+            else:
+                self.position = self.position[0] + self.x_speed, self.position[1]
+        self.x_speed = 0
 
     def passive_move(self):
-            changed = False
-            last_pos = self.position
-            if self.x_speed:
-                if self.x_speed > 0:
-                    if collision(self, 'right'):
-                        self.x_speed = 0
-                    else:
-                        self.position = self.position[0] + self.x_speed, self.position[1]
-                        self.x_speed -= self.speed_decrease
-                        if self.x_speed < 0:
-                            self.x_speed = 0
-                            changed = True
+        changed = False
+        last_pos = self.position
+        self.change_speed((0, G))
+        if self.x_speed:
+            if self.x_speed > 0:
+                if collision(self, 'right'):
+                    self.x_speed = 0
                 else:
-                        if collision(self, 'left'):
-                            self.x_speed = 0
-                        else:
-                            self.position = self.position[0] + self.x_speed, self.position[1]
-                            self.x_speed += self.speed_decrease
-                            if self.x_speed > 0:
-                                self.x_speed = 0
-                            changed = True
-
-            if self.y_speed:
-                if self.y_speed > 0:
-                    if collision(self, 'down'):
+                    self.position = self.position[0] + self.x_speed, self.position[1]
+                    self.x_speed -= self.speed_decrease
+                    if self.x_speed < 0:
                         self.x_speed = 0
-                    else:
-                        self.position = self.position[0], self.position[1] + self.y_speed
-                        self.y_speed -= self.speed_decrease
-                        if self.y_speed < 0:
-                            self.y_speed = 0
                         changed = True
+            else:
+                if collision(self, 'left'):
+                    self.x_speed = 0
                 else:
-                        if collision(self, 'up'):
-                            self.y_speed = 0
-                        else:
-                            self.position = self.position[0], self.position[1] + self.y_speed
-                            self.y_speed += self.speed_decrease
-                            if self.y_speed > 0:
-                                self.y_speed = 0
-                        changed = True
+                    self.position = self.position[0] + self.x_speed, self.position[1]
+                    self.x_speed += self.speed_decrease
+                    if self.x_speed > 0:
+                        self.x_speed = 0
+                    changed = True
 
-            if changed:
-                self.last_pos = last_pos
+        if self.y_speed:
+            if self.y_speed > 0:
+                if collision(self, 'down'):
+                    self.x_speed = 0
+                else:
+                    self.position = self.position[0], self.position[1] + self.y_speed
+                    self.y_speed -= self.speed_decrease
+                    if self.y_speed < 0:
+                        self.y_speed = 0
+                    changed = True
+            else:
+                if collision(self, 'up'):
+                    self.y_speed = 0
+                else:
+                    self.position = self.position[0], self.position[1] + self.y_speed
+                    self.y_speed += self.speed_decrease
+                    if self.y_speed > 0:
+                        self.y_speed = 0
+                changed = True
+
+        if changed:
+            self.last_pos = last_pos
+
+        return changed
 
 
 def collision(self, direction):
     if direction == 'left':
         for i in range(self.pos[0] - 2, self.pos[0]):
             for j in range(self.pos[1], self.pos[1] + self.pl_size):
-                if map[j][i]:
+                if bitmap[j][i]:
                     return True
     elif direction == 'right':
         for i in range(self.pos[0] + self.pl_size + 1, self.pos[0] + self.pl_size + 3):
             for j in range(self.pos[1], self.pos[1] + self.pl_size):
-                if map[j][i]:
+                if bitmap[j][i]:
                     return True
     elif direction == 'up':
         for i in range(self.pos[0], self.pos[0] + self.pl_size):
             for j in range(self.pos[1] + 1, self.pos[1] + 3):
-                if map[j][i]:
+                if bitmap[j][i]:
                     return True
     else:
         for i in range(self.pos[0], self.pos[0] + self.pl_size):
             for j in range(self.pos[1] + self.pl_size + 1, self.pos[1] + self.pl_size + 3):
-                if map[j][i]:
+                if bitmap[j][i]:
                     return True
     return False
-
