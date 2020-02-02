@@ -4,6 +4,7 @@ FPS = 50
 clock = pygame.time.Clock()
 window: pygame.Surface = pygame.display.set_mode((1920, 1080))
 
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     image = pygame.image.load(fullname).convert()
@@ -15,13 +16,15 @@ def load_image(name, colorkey=None):
         image = image.convert_alpha()
     return image
 
+
 def terminate():
     pygame.quit()
     sys.exit()
 
+
 def start_screen():
     intro_text = "Gooks"
-    fon = pygame.transform.scale(load_image('fon.png'), (1920, 1080))
+    fon = pygame.transform.scale(load_image('vietnam_war.png'), (1920, 1080))
     window.blit(fon, (0, 0))
     title_font = pygame.font.Font(None, 200)
     text = title_font.render(intro_text, True, pygame.Color('white'))
@@ -47,4 +50,6 @@ def start_screen():
                     terminate()
         pygame.display.flip()
         clock.tick(FPS)
+
+
 start_screen()

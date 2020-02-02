@@ -12,7 +12,7 @@ SHOOT_UP_IMG = 'shoot_up.png'
 SHOOT_UP_RES = (80, 70)
 
 CANNON_PROJ_IMG = 'cannon_proj.png'
-CANNON_PROJ_RES = (8, 8)
+CANNON_PROJ_RES = (30, 14)
 RIFLE_PROJ_IMG = 'rifle_proj.png'
 RIFLE_PROJ_RES = (100, 100)
 LASER_PROJ_IMG = 'laser_proj.png'
@@ -44,9 +44,9 @@ WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
            'grenade': (GRENADE_IMG, GRENADE_RES),
            'laser': (LASER_IMG, LASER_RES)}
 
-TEAMS = [['BTS', 'BLUE', [(0, 0)], ('ChiMin',)],
-         ['CHUCHE', 'RED', [(500, 0)], ('KimChenIn',)],
-         ['ANIME', 'WHITE', [(1700, 0)], ('Hidetaka',)]]
+TEAMS = [['BTS', 'blue', [(0, 0)], ('ChiMin',)],
+         ['CHUCHE', 'red', [(500, 0)], ('KimChenIn',)],
+         ['ANIME', 'white', [(1700, 0)], ('Hidetaka',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
 FPS = 60
