@@ -288,6 +288,12 @@ class Gook(Thing):
                 collision_check = self.collision('right', self.x_speed)
                 if collision_check:
                     self.x_speed = collision_check - self.get_x() - self.size[0]
+                    if self.x_speed == 0:
+                        for i in range(1, 20):
+                            collision_check = self.collision('right', kx=1, ky=i)
+                            if not collision_check:
+                                self.move(1, -i)
+                                break
             else:
                 self.x_speed = -MOVEMENT_SPEED
                 self.direction = 'left'
