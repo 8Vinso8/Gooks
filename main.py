@@ -15,6 +15,7 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
     else:
+        print('alpha')
         image = image.convert_alpha()
     return image
 
@@ -39,20 +40,6 @@ def next_turn():
         team_gen = get_next_team()
         cur_team = next(team_gen)
         cur_gook = cur_team.get_gook(n_gook)
-    print(cur_team, cur_gook)
-
-
-def optimised_draw(moved_gooks, bullets, bitmap, window):  # Bitmap заменить на название переменной карты
-    # Закрашивание прошлых позиций
-    for gook in moved_gooks:
-        bitmap.draw_part(window, gook.get_last_pos(), gook.get_size())
-    for bullet in bullets:
-        bitmap.draw_part(window, bullet.get_last_pos(), bullet.get_size())
-    # отрисовка объектов
-    for gook in moved_gooks:
-        gook.draw(window)
-    for bullet in bullets:
-        bullet.draw(window)
 
 
 class Map:
@@ -68,7 +55,6 @@ class Map:
             for line in f.readlines():
                 line_list = list(map(int, list(line.strip())))
                 self.bitmap.append(line_list)
-        print(self.bitmap)
 
     def draw(self, window):
         for i in range(1920):
@@ -86,6 +72,7 @@ class Map:
                 # Поменять цвета местами если баги
 
     def explode(self, window, point, size):
+        point = tuple(map(round, point))
         for i in range(point[0] - size, point[0] + size):
             for j in range(point[1] - size, point[1] + size):
                 try:
@@ -104,7 +91,6 @@ class Thing:
         self.position = pos
         self.size = size
         self.image = load_image(image, colorkey=-1)
-        self.last_pos = pos
 
     def get_x(self):
         return self.position[0]
@@ -118,8 +104,8 @@ class Thing:
     def get_pos(self):
         return self.position
 
-    def get_last_pos(self):
-        return self.last_pos
+    def change_image(self, image):
+        self.image = load_image(image, colorkey=-1)
 
     def get_rect(self):
         return pygame.Rect(self.get_x(), self.get_y(), self.get_size()[0], self.get_size()[1])
@@ -132,45 +118,43 @@ class Thing:
         window.blit(self.image, self.rect)
 
     def move(self, x, y):
-        self.last_pos = self.get_pos()
         self.position = (self.get_x() + x, self.get_y() + y)
 
-    def collision(self, direction):
+    def collision(self, direction, speed=1):
         if direction == 'left':
-            for i in range(int(self.get_pos()[0]) - 2, int(self.get_pos()[0])):
-                for j in range(int(self.get_pos()[1]), int(self.get_pos()[1] + self.get_size()[1])):
+            for i in range(round(self.get_pos()[0]), round(self.get_pos()[0] - speed)):
+                for j in range(round(self.get_pos()[1]), round(self.get_pos()[1] + self.get_size()[1])):
                     try:
                         if self.bitmap.get_bitmap()[j][i]:
-                            return True
+                            return i
                     except IndexError:
                         continue
-        elif direction == 'right':
-            for i in range(int(self.get_pos()[0] + self.get_size()[0]) + 1,
-                           int(self.get_pos()[0] + self.get_size()[0]) + 3):
-                for j in range(int(self.get_pos()[1]), int(self.get_pos()[1] + self.get_size()[1])):
+        if direction == 'right':
+            for i in range(round(self.get_pos()[0] + self.get_size()[0]),
+                           round(self.get_pos()[0] + self.get_size()[0] + speed)):
+                for j in range(round(self.get_pos()[1]), round(self.get_pos()[1] + self.get_size()[1])):
                     try:
                         if self.bitmap.get_bitmap()[j][i]:
-                            return True
+                            return i
                     except IndexError:
                         continue
-        elif direction == 'up':
-            for i in range(int(self.get_pos()[0]), int(self.get_pos()[0] + self.get_size()[0])):
-                for j in range(int(self.get_pos()[1]) + 1, int(self.get_pos()[1]) + 3):
+        if direction == 'up':
+            for j in range(round(self.get_pos()[1]) - 1, round(self.get_pos()[1] - speed) - 1):
+                for i in range(round(self.get_pos()[0]), round(self.get_pos()[0] + self.get_size()[0])):
                     try:
                         if self.bitmap.get_bitmap()[j][i]:
-                            return True
+                            return j
                     except IndexError:
                         continue
-        else:
-            for i in range(int(self.get_pos()[0]), int(self.get_pos()[0] + self.get_size()[0])):
-                for j in range(int(self.get_pos()[1] + self.get_size()[1]) + 1,
-                               int(self.get_pos()[1] + self.get_size()[1]) + 3):
+        if direction == 'down':
+            for j in range(round(self.get_pos()[1] + self.get_size()[1]),
+                           round(self.get_pos()[1] + self.get_size()[1] + speed)):
+                for i in range(round(self.get_pos()[0]), round(self.get_pos()[0] + self.get_size()[0])):
                     try:
                         if self.bitmap.get_bitmap()[j][i]:
-                            return True
+                            return j
                     except IndexError:
                         continue
-        return False
 
 
 class Bullet(Thing):
@@ -183,17 +167,19 @@ class Bullet(Thing):
         self.explosion = PROJECTILES[weapon][4]
 
     def move(self):
-        super().move(int(self.speed_x), int(self.speed_y))
+        last_pos = self.get_pos()
+        super().move(round(self.speed_x), round(self.speed_y))
         self.speed_y += self.g
+        return last_pos
 
-    def check_boom(self):
+    def check_state(self):
         if self.get_x() + self.get_size()[0] >= RESOLUTION[0] or \
                 self.get_y() + self.get_size()[1] >= RESOLUTION[1] or \
                 self.get_x() < 0 or \
                 self.get_y() < 0:
             return 'delete'
-        if self.collision('left') or self.collision('right') \
-                or self.collision('down') or self.collision('up'):
+        if self.collision('left', self.speed_x) or self.collision('right', self.speed_x) \
+                or self.collision('down', self.speed_y) or self.collision('up', self.speed_y):
             return 'BOOM'
         # Проверка столкновения
 
@@ -216,13 +202,8 @@ class Gook(Thing):
         self.y_speed = 0
         self.speed_decrease = 0.5  # Замедление
 
-        self.image = load_image(start_image, colorkey=-1)
-
     def get_weapon(self):
         return self.weapon
-
-    def change_image(self, image):
-        self.image = load_image(image, colorkey=-1)
 
     def change_speed(self, change):  # change - кортеж изменения скорости (x, y)
         self.x_speed += change[0]
@@ -230,87 +211,79 @@ class Gook(Thing):
 
     def key_move(self, move):
         last_direction = self.direction
-        self.last_pos = self.get_pos()
+        last_pos = self.get_pos()
         if self.collision('down'):
             if move == 'D':
-                self.x_speed = 5
+                self.x_speed = MOVEMENT_SPEED
                 self.direction = 'right'
+                collision_check = self.collision('right', self.x_speed)
+                if collision_check:
+                    self.x_speed = collision_check - self.get_x() - self.size[0]
             else:
-                self.x_speed = -5
+                self.x_speed = -MOVEMENT_SPEED
                 self.direction = 'left'
+                collision_check = self.collision('left', self.x_speed)
+                print(collision_check)
+                if collision_check:
+                    self.x_speed = self.get_x() - collision_check
 
-        if self.x_speed > 0:
-            if self.collision('right'):
-                self.x_speed = 0
-
-        elif self.x_speed < 0:
-            if self.collision('left'):
-                self.x_speed = 0
-
-        self.move(self.x_speed, self.y_speed)
+        self.move(self.x_speed, 0)
 
         self.x_speed = 0
 
         if self.direction != last_direction:
-            print(self.direction, last_direction)
             self.image = pygame.transform.flip(self.image, True, False)
+        return last_pos
 
     def jump(self):
+        last_pos = self.get_pos()
         if self.collision('down'):
             if self.direction == 'left':
                 self.change_speed((10, -20))
             else:
                 self.change_speed((-10, -20))
+        return last_pos
 
     def passive_move(self):
         changed = False
         last_pos = self.position
         self.change_speed((0, G))
         if self.x_speed > 0:
-            if self.collision('right'):
-                self.x_speed = 0
-            else:
-                self.position = self.position[0] + self.x_speed, self.position[1]
-                self.x_speed -= self.speed_decrease
-                if self.x_speed < 0:
-                    self.x_speed *= -0.5
-                changed = True
+            collision_check = self.collision('right', self.x_speed)
+            if collision_check:
+                self.x_speed = collision_check - self.get_x() - self.size[0]
         elif self.x_speed < 0:
-            if self.collision('left'):
-                self.x_speed *= -0.5
-            else:
-                self.position = self.position[0] + self.x_speed, self.position[1]
-                self.x_speed += self.speed_decrease
-                if self.x_speed > 0:
-                    self.x_speed = 0
-                changed = True
-
+            collision_check = self.collision('left', self.x_speed)
+            if collision_check:
+                self.x_speed = collision_check - self.get_x()
         if self.y_speed > 0:
-            if self.collision('down'):
-                self.y_speed = 0
-            else:
-                self.position = self.position[0], self.position[1] + self.y_speed
-                if self.y_speed < 0:
-                    self.y_speed = 0
-                changed = True
+            collision_check = self.collision('down', self.y_speed)
+            if collision_check:
+                print(collision_check, self.get_y() + self.get_size()[1])
+                self.y_speed = collision_check - self.get_y() - self.size[1]
         elif self.y_speed < 0:
-            if self.collision('up'):
-                self.y_speed = 0
-            else:
-                self.position = self.position[0], self.position[1] + self.y_speed
-                if self.y_speed > 0:
-                    self.y_speed = 0
+            collision_check = self.collision('up', self.y_speed)
+            if collision_check:
+                self.y_speed = self.get_y() - collision_check - 1
+        if self.x_speed or self.y_speed:
+            self.move(self.x_speed, self.y_speed)
             changed = True
-
+        if self.x_speed > 0:
+            self.x_speed -= self.speed_decrease
+            if self.x_speed < 0:
+                self.x_speed = 0
+        if self.x_speed < 0:
+            self.x_speed += self.speed_decrease
+            if self.x_speed > 0:
+                self.x_speed = 0
         if changed:
-            self.last_pos = last_pos
-
-        return changed
+            return last_pos
 
     def shoot(self, final_cords, power):
         fin_x, fin_y = final_cords
         st_x, st_y = self.get_x() + self.get_size()[0] // 2, self.get_y() + self.get_size()[1] // 2
         angle = math.atan2((fin_y - st_y), (fin_x - st_x))
+        print(angle)
         return Bullet(
             self.bitmap,
             (self.get_x() + self.get_size()[0] // 2, self.get_y() + self.get_size()[1] // 2),
@@ -323,7 +296,6 @@ class Gook(Thing):
 class Team:
     def __init__(self, bitmap, team_name, team_color, positions, names):
         self.gooks = list()
-        print(positions, names)
         for i in range(TEAM_LEN):
             self.gooks.append(Gook(bitmap, positions[i], team_color, names[i], GOOK_RES, GOOK_IMG))
         self.team_name = team_name
@@ -348,7 +320,7 @@ def main():
 
     clock = pygame.time.Clock()
 
-    map1 = Map('map.txt', (0, 255, 0), (0, 0, 0))
+    map1 = Map('map.txt', (50, 150, 255), pygame.Color('black'))
     map1.draw(window)
 
     for team in TEAMS:
@@ -375,8 +347,8 @@ def main():
                     is_working = False
                 if event.key == K_SPACE:
                     is_jumped = True
-                    cur_gook.jump()
-                    moved_gooks.append(cur_gook)
+                    jump_last_pos = cur_gook.jump()
+                    map1.draw_part(window, jump_last_pos, cur_gook.get_size())
 
             if not is_mouse_down and event.type == MOUSEBUTTONDOWN:
                 start_ticks = pygame.time.get_ticks()
@@ -387,37 +359,43 @@ def main():
                     time = 2700
                 power = time / 3000 + 0.1
                 bullets.append(cur_gook.shoot(event.pos, power))
-                print(power)
                 is_mouse_down = False
 
         if not is_jumped:
             keys = pygame.key.get_pressed()
             if keys[K_a]:
-                cur_gook.key_move('A')
-                moved_gooks.append(cur_gook)
+                key_move_last_pos = cur_gook.key_move('A')
+                map1.draw_part(window, key_move_last_pos, cur_gook.get_size())
+                cur_gook.draw(window)
             if keys[K_d]:
-                cur_gook.key_move('D')
-                moved_gooks.append(cur_gook)
+                key_move_last_pos = cur_gook.key_move('D')
+                map1.draw_part(window, key_move_last_pos, cur_gook.get_size())
+                cur_gook.draw(window)
         if cur_gook.collision('down'):
             is_jumped = False
 
+        # Проверка непроизвольного движения гуков
         for team in teams:
             for gook in team.get_gooks():
-                if gook.passive_move():
-                    moved_gooks.append(gook)
+                last_pos_or_none = gook.passive_move()
+                if last_pos_or_none:
+                    map1.draw_part(window, last_pos_or_none, gook.get_size())
+                    gook.draw(window)
 
+        # Отрисовка и проверка состояния пуль
         for bullet in bullets:
-            bullet.move()
-            state = bullet.check_boom()
+            bullet_last_pos = bullet.move()
+            state = bullet.check_state()
             if state == 'BOOM':
                 bullet.boom(window)
             if state:
-                map1.draw_part(window, bullet.get_last_pos(), bullet.get_size())
+                map1.draw_part(window, bullet_last_pos, bullet.get_size())
                 bullets.remove(bullet)
+            else:
+                map1.draw_part(window, bullet_last_pos, bullet.get_size())
+                bullet.draw(window)
 
-        optimised_draw(moved_gooks, bullets, map1, window)
         cur_gook.draw(window)
-        moved_gooks.clear()
         pygame.display.flip()
         clock.tick(FPS)
 

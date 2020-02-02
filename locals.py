@@ -1,15 +1,15 @@
 RESOLUTION = 1920, 1080
 
 GOOK_IMG = 'wait.png'
-GOOK_RES = (200, 200)
+GOOK_RES = (80, 64)
 MOVE1_IMG = 'move1.png'
-MOVE1_RES = (200, 200)
+MOVE1_RES = (80, 76)
 MOVE2_IMG = 'move2.png'
-MOVE2_RES = (200, 200)
+MOVE2_RES = (80, 74)
 SHOOT_FORWARD_IMG = 'shoot_forward.png'
-SHOOT_FORWARD_RES = (200, 200)
+SHOOT_FORWARD_RES = (80, 68)
 SHOOT_UP_IMG = 'shoot_up.png'
-SHOOT_UP_RES = (200, 200)
+SHOOT_UP_RES = (80, 70)
 
 CANNON_PROJ_IMG = 'cannon_proj.png'
 CANNON_PROJ_RES = (8, 8)
@@ -42,10 +42,11 @@ WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
 TEAMS = [['BTS', 'BLUE', [(500, 0)], ('Tahyon',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
-FPS = 120
+FPS = 60
 
 G = 1
 
+MOVEMENT_SPEED = 5
 wind = 0
 moved_gooks = []
 bullets = []
