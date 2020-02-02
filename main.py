@@ -16,6 +16,12 @@ def draw_interface(window, wind_num, timer, cur_team_name, cur_gook_name):
     window.blit(timer_text, [1920 // 2, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
+    
+    
+explode_sound = pygame.mixer.Sound('data/explode.wav')
+shot_sound = pygame.mixer.Sound('data/shot.wav')
+soundtrack = pygame.mixer.Sound('data/shot.wav')
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -92,6 +98,7 @@ class Map:
                     window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.color_zero)
                 except IndexError:
                     continue
+        explode_sound.play()
 
     def get_bitmap(self):
         return self.bitmap
@@ -329,6 +336,7 @@ class Gook(Thing):
             angle,
             power
         )
+        shot_sound.play()
 
     def make_damage(self, dmg):
         self.hp -= dmg
@@ -390,7 +398,7 @@ def main():
     for team in teams:
         for gook in team.get_gooks():
             gook.draw(window)
-
+    soundtrack.play(-1)
     while is_working:
         for event in pygame.event.get():
             if event.type == QUIT:
