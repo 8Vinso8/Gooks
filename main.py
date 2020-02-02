@@ -6,6 +6,16 @@ import random
 import itertools
 import os
 
+def draw_interface(window, wind_num, timer, cur_team_name, cur_gook_name):
+    font = pygame.font.Font(None, 10)
+    wind_text = font.render(str(wind_num), True, pygame.Color('white'))
+    timer_text = font.render(str(timer), True, pygame.Color('white'))
+    cur_team_text = font.render(cur_team_name, True, pygame.Color('white'))
+    cur_gook_text = font.render(cur_gook_name, True, pygame.Color('white'))
+    window.blit(wind_text, [10, 10])
+    window.blit(timer_text, [1920 // 2, 10])
+    window.blit(cur_team_text, [1700, 10])
+    window.blit(cur_gook_text, [1700, 40])
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -162,19 +172,19 @@ class Thing:
         if changed:
             return last_pos
 
-    def collision(self, direction, speed=1):
+    def collision(self, direction, speed=1, kx=0, ky=0):
         if direction == 'left':
-            for i in range(round(self.get_pos()[0]), round(self.get_pos()[0] - speed)):
-                for j in range(round(self.get_pos()[1]), round(self.get_pos()[1] + self.get_size()[1])):
+            for i in range(round(self.get_pos()[0]) - kx, round(self.get_pos()[0] - speed) - kx):
+                for j in range(round(self.get_pos()[1]) - ky, round(self.get_pos()[1] + self.get_size()[1]) - ky):
                     try:
                         if self.bitmap.get_bitmap()[j][i]:
                             return i
                     except IndexError:
                         continue
         if direction == 'right':
-            for i in range(round(self.get_pos()[0] + self.get_size()[0]),
-                           round(self.get_pos()[0] + self.get_size()[0] + speed)):
-                for j in range(round(self.get_pos()[1]), round(self.get_pos()[1] + self.get_size()[1])):
+            for i in range(round(self.get_pos()[0] + self.get_size()[0]) + kx,
+                           round(self.get_pos()[0] + self.get_size()[0] + speed) + kx):
+                for j in range(round(self.get_pos()[1]) - ky, round(self.get_pos()[1] + self.get_size()[1]) - ky):
                     try:
                         if self.bitmap.get_bitmap()[j][i]:
                             return i
@@ -253,6 +263,14 @@ class Gook(Thing):
         self.y_speed = 0
         self.speed_decrease = 0.5  # Замедление
         self.hp = 100
+   
+    def draw(self, window):
+        super().draw(window)
+        font = pygame.font.Font(None, 30)
+        #hp_text = font.render(self.hp, True, pygame.Color('green'))
+        name_text = font.render(self.name, True, pygame.Color('black'))
+        #window.blit(hp_text, [self.position[0], self.position[1] - 10)
+        window.blit(name_text, [self.position[0], self.position[1] - 20])        
 
     def get_weapon(self):
         return self.weapon
