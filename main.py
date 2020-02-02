@@ -5,17 +5,25 @@ from locals import *
 import random
 import itertools
 import os
+import sys
+
 
 def draw_interface(window, wind_num, timer, cur_team_name, cur_gook_name):
-    font = pygame.font.Font(None, 10)
+    font = pygame.font.Font(None, 50)
     wind_text = font.render(str(wind_num), True, pygame.Color('white'))
     timer_text = font.render(str(timer), True, pygame.Color('white'))
-    cur_team_text = font.render(cur_team_name, True, pygame.Color('white'))
-    cur_gook_text = font.render(cur_gook_name, True, pygame.Color('white'))
+    cur_team_text = font.render(str(cur_team_name), True, pygame.Color('white'))
+    cur_gook_text = font.render(str(cur_gook_name), True, pygame.Color('white'))
     window.blit(wind_text, [10, 10])
-    window.blit(timer_text, [1920 // 2, 10])
+    window.blit(timer_text, [910, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -75,8 +83,8 @@ class Map:
 
     def draw_part(self, window, start, size):
         start = tuple(map(int, start))
-        for i in range(start[0], start[0] + size[0]):
-            for j in range(start[1], start[1] + size[1]):
+        for i in range(start[0], start[0] + size[0] + 30):
+            for j in range(start[1] - 20, start[1] + size[1]):
                 try:
                     window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.color_zero)
                 except IndexError:
@@ -127,6 +135,14 @@ class Thing:
 
     def get_rect(self):
         return pygame.Rect(self.get_x(), self.get_y(), self.get_size()[0], self.get_size()[1])
+
+    def check_state(self):
+        if self.get_x() + self.get_size()[0] >= RESOLUTION[0] or \
+                self.get_y() + self.get_size()[1] >= RESOLUTION[1] or \
+                self.get_x() < 0 or \
+                self.get_y() < 0:
+            print('del')
+            return 'delete'
 
     def draw(self, window):
         self.rect = self.image.get_rect(
@@ -229,11 +245,8 @@ class Bullet(Thing):
         return self.dmg
 
     def check_state(self):
-        if self.get_x() + self.get_size()[0] >= RESOLUTION[0] or \
-                self.get_y() + self.get_size()[1] >= RESOLUTION[1] or \
-                self.get_x() < 0 or \
-                self.get_y() < 0:
-            return 'delete'
+        if super().check_state():
+            return super().check_state()
         if self.collision('left', self.x_speed) or self.collision('right', self.x_speed) \
                 or self.collision('down', self.y_speed) or self.collision('up', self.y_speed):
             return 'BOOM'
@@ -263,13 +276,16 @@ class Gook(Thing):
         self.y_speed = 0
         self.speed_decrease = 0.5  # Замедление
         self.hp = 100
+
+    def __str__(self):
+        return self.name
    
     def draw(self, window):
         super().draw(window)
         font = pygame.font.Font(None, 30)
-        #hp_text = font.render(self.hp, True, pygame.Color('green'))
-        name_text = font.render(self.name, True, pygame.Color('black'))
-        #window.blit(hp_text, [self.position[0], self.position[1] - 10)
+        hp_text = font.render(str(self.get_hp()), True, pygame.Color('green'))
+        name_text = font.render(self.name, True, pygame.Color(self.color))
+        window.blit(hp_text, [self.position[0], self.position[1] - 10])
         window.blit(name_text, [self.position[0], self.position[1] - 20])        
 
     def get_weapon(self):
@@ -293,7 +309,7 @@ class Gook(Thing):
                 self.direction = 'left'
                 collision_check = self.collision('left', self.x_speed)
                 if collision_check:
-                    self.x_speed = self.get_x() - collision_check
+                    self.x_speed = collision_check - self.get_x()
 
         self.move(self.x_speed, 0)
 
@@ -345,6 +361,9 @@ class Team:
             self.gooks.append(Gook(bitmap, positions[i], team_color, names[i], GOOK_RES, GOOK_IMG))
         self.team_name = team_name
 
+    def __str__(self):
+        return self.team_name
+
     def get_gook(self, n):
         return self.gooks[n % len(self.gooks)] if self.gooks else None
 
@@ -361,6 +380,60 @@ class Team:
             return True
 
 
+def start_screen(window, clock):
+    intro_text = "Gooks"
+    fon = pygame.transform.scale(load_image('vietnam_war.png'), (1920, 1080))
+    window.blit(fon, (0, 0))
+    title_font = pygame.font.Font(None, 200)
+    text = title_font.render(intro_text, True, pygame.Color('white'))
+    window.blit(text, [250, 250])
+    start_button = pygame.Rect([500, 500, 200, 100])
+    exit_button = pygame.Rect([800, 500, 200, 100])
+    pygame.draw.rect(window, pygame.Color('white'), exit_button, 2)
+    pygame.draw.rect(window, pygame.Color('white'), start_button, 2)
+
+    button_font = pygame.font.Font(None, 50)
+    start_text = button_font.render('Начать!', True, pygame.Color('white'))
+    exit_text = button_font.render('Выйти', True, pygame.Color('white'))
+    window.blit(start_text, [510, 510])
+    window.blit(exit_text, [810, 510])
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.collidepoint(event.pos):
+                    return
+                elif exit_button.collidepoint(event.pos):
+                    terminate()
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def win_screen(window, clock, winner):
+    intro_text = f"Победили {winner}"
+    fon = pygame.transform.scale(load_image('win_screen.png'), (1920, 1080))
+    window.blit(fon, (0, 0))
+    title_font = pygame.font.Font(None, 200)
+    text = title_font.render(intro_text, True, pygame.Color('white'))
+    window.blit(text, [250, 250])
+    exit_button = pygame.Rect([800, 500, 200, 100])
+    pygame.draw.rect(window, pygame.Color('white'), exit_button, 2)
+
+    button_font = pygame.font.Font(None, 50)
+    exit_text = button_font.render('Выйти', True, pygame.Color('white'))
+    window.blit(exit_text, [810, 510])
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if exit_button.collidepoint(event.pos):
+                    terminate()
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 def main():
     is_working = True
     fullscreen = True
@@ -374,6 +447,8 @@ def main():
 
     clock = pygame.time.Clock()
 
+    start_screen(window, clock)
+
     map1 = Map('map.txt', (50, 150, 255), pygame.Color('black'))
     map1.draw(window)
 
@@ -381,6 +456,8 @@ def main():
         teams.append(Team(map1, *team))
 
     next_turn()
+    turn_start_time = pygame.time.get_ticks()
+
     for team in teams:
         for gook in team.get_gooks():
             gook.draw(window)
@@ -402,7 +479,7 @@ def main():
                 if event.key == K_SPACE:
                     is_jumped = True
                     jump_last_pos = cur_gook.jump()
-                    map1.draw_part(window, jump_last_pos, cur_gook.get_size())
+                    map1.draw_part(window, (jump_last_pos[0], jump_last_pos[1] - 30), cur_gook.get_size())
 
             if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN:
                 start_ticks = pygame.time.get_ticks()
@@ -432,7 +509,10 @@ def main():
             graveyard_last_pos = graveyard.passive_move()
             if graveyard_last_pos:
                 map1.draw_part(window, graveyard_last_pos, graveyard.get_size())
-            graveyard.draw(window)
+            if graveyard.check_state():
+                graveyards.remove(graveyard)
+            else:
+                graveyard.draw(window)
 
         # Отрисовка и проверка состояния пуль
         for bullet in bullets:
@@ -444,18 +524,24 @@ def main():
                     for gook in team.get_gooks():
                         if gook.get_rect().colliderect(boom_rect):
                             gook.make_damage(bullet.get_dmg())
-                            map1.draw_part(window, gook.get_pos(), gook.get_size())
+                            gook_last_pos = gook.get_pos()
                             if not gook.check_is_alive():
+                                map1.draw_part(window, gook_last_pos, gook.get_size())
                                 graveyards.append(gook.make_graveyard())
+                                if gook == cur_gook:
+                                    next_turn()
                                 team.remove_gook(gook)
-                                if not team.check_state():
-                                    teams.remove(team)
 
             if state:
                 map1.draw_part(window, bullet_last_pos, bullet.get_size())
                 bullets.remove(bullet)
+                print(bullets)
                 next_turn()
+                map1.draw_part(window, (0, 10), (30, 50))
+                map1.draw_part(window, (1700, 10), (175, 100))
+                turn_start_time = pygame.time.get_ticks()
             else:
+                print(bullets)
                 map1.draw_part(window, bullet_last_pos, bullet.get_size())
                 bullet.draw(window)
         # Проверка непроизвольного движения гуков
@@ -465,8 +551,19 @@ def main():
                 if last_pos_or_none:
                     map1.draw_part(window, last_pos_or_none, gook.get_size())
                     gook.draw(window)
+                if gook.check_state():
+                    if gook == cur_gook:
+                        next_turn()
+                    team.remove_gook(gook)
 
+        map1.draw_part(window, (910, 10), (30, 50))
         cur_gook.draw(window)
+        timer = (pygame.time.get_ticks() - turn_start_time) // 1000
+        draw_interface(window, wind, timer, cur_team, cur_gook)
+        if not team.check_state():
+            teams.remove(team)
+            if len(teams) == 1:
+                win_screen(window, clock, teams[0])
         pygame.display.flip()
         clock.tick(FPS)
 
