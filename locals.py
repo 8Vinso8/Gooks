@@ -27,19 +27,26 @@ RIFLE_RES = (100, 100)
 LASER_IMG = 'laser.png'
 LASER_RES = (100, 100)
 
-PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 1, 50, 150),
-               'rifle': (RIFLE_PROJ_IMG, RIFLE_PROJ_RES, 0.2, 10, 5),
-               'grenade': (GRENADE_IMG, GRENADE_RES, 1, 2, 150),
-               'laser': (LASER_PROJ_IMG, LASER_PROJ_RES, 0, 20, 5)}
+CANNON_DMG = 60
+GRENADE_DMG = 60
+RIFLE_DMG = 50
+LASER_DMG = 50
+
+GRAVEYARD_IMG = 'graveyard.png'
+GRAVEYARD_RES = (53, 59)
+
+PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 1, 50, 150, 60),
+               'rifle': (RIFLE_PROJ_IMG, RIFLE_PROJ_RES, 0.2, 10, 5, 60),
+               'grenade': (GRENADE_IMG, GRENADE_RES, 1, 2, 150, 40),
+               'laser': (LASER_PROJ_IMG, LASER_PROJ_RES, 0, 20, 5, 40)}
 WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
            'rifle': (RIFLE_IMG, RIFLE_RES),
            'grenade': (GRENADE_IMG, GRENADE_RES),
            'laser': (LASER_IMG, LASER_RES)}
 
-'''TEAMS = [['BTS', 'BLUE', [(0, 0), (0, 500), (0, 1000)], ('ChiMin', 'ChinGook', 'Tahyon')],
-         ['CHUCHE', 'RED', [(500, 0), (500, 500), (500, 1000)], ('KimChenIn', 'KimChenIr', 'KimIrSen')],
-         ['ANIME', 'WHITE', [(1000, 0), (1000, 500), (1000, 1000)], ('Hidetaka', 'Hayao', 'Kodjima')]]'''
-TEAMS = [['BTS', 'BLUE', [(500, 0)], ('Tahyon',)]]
+TEAMS = [['BTS', 'BLUE', [(0, 0)], ('ChiMin',)],
+         ['CHUCHE', 'RED', [(500, 0)], ('KimChenIn',)],
+         ['ANIME', 'WHITE', [(1700, 0)], ('Hidetaka',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
 FPS = 60
@@ -51,6 +58,7 @@ wind = 0
 moved_gooks = []
 bullets = []
 teams = []
+graveyards = []
 cur_gook = None
 cur_team = None
 
