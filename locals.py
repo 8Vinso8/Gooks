@@ -1,4 +1,3 @@
-BACKGROUND_IMG = 'background.png'
 RESOLUTION = 1920, 1080
 
 GOOK_IMG = 'wait.png'
@@ -46,20 +45,11 @@ TEAM_LEN = len(TEAMS[0][3])
 FPS = 120
 
 G = 1
-wind = 0
 
+wind = 0
 moved_gooks = []
 bullets = []
 teams = []
 cur_gook = None
 cur_team = None
 
-POSITIONS = [(100, 400), (200, 400), (300, 400),
-             (400, 400), (500, 400), (600, 400),
-             (700, 400), (800, 400), (900, 400)]
-
-is_working = True
-fullscreen = True
-is_shot = False
-is_mouse_down = False
-is_jumped = False
