@@ -28,8 +28,6 @@ def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name):
     window.blit(cur_gook_text, [1700, 40])
     
 
-
-
 def terminate():
     pygame.quit()
     sys.exit()
