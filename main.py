@@ -117,7 +117,6 @@ class Map:
             )
         )
 
-
     def get_bitmap(self):
         return self.bitmap
 
@@ -442,7 +441,7 @@ def start_screen(window, clock):
     fon = pygame.transform.scale(load_image('vietnam_war.png'), (1920, 1080))
     window.blit(fon, (0, 0))
     title_font = pygame.font.Font(None, 200)
-    text = title_font.render(intro_text, True, pygame.Color('white'))
+    text = title_font.render(intro_text, True, pygame.Color('red'))
     window.blit(text, [250, 250])
     start_button = pygame.Rect([500, 500, 200, 100])
     exit_button = pygame.Rect([800, 500, 200, 100])
@@ -450,8 +449,8 @@ def start_screen(window, clock):
     pygame.draw.rect(window, pygame.Color('white'), start_button, 2)
 
     button_font = pygame.font.Font(None, 50)
-    start_text = button_font.render('Начать!', True, pygame.Color('white'))
-    exit_text = button_font.render('Выйти', True, pygame.Color('white'))
+    start_text = button_font.render('Начать!', True, pygame.Color('red'))
+    exit_text = button_font.render('Выйти', True, pygame.Color('red'))
     window.blit(start_text, [510, 510])
     window.blit(exit_text, [810, 510])
     while True:
@@ -472,20 +471,22 @@ def win_screen(window, clock, winner):
     fon = pygame.transform.scale(load_image('win_screen.png'), (1920, 1080))
     window.blit(fon, (0, 0))
     title_font = pygame.font.Font(None, 200)
-    text = title_font.render(intro_text, True, pygame.Color('white'))
+    text = title_font.render(intro_text, True, pygame.Color('red'))
     window.blit(text, [250, 250])
     exit_button = pygame.Rect([800, 500, 200, 100])
-    pygame.draw.rect(window, pygame.Color('white'), exit_button, 2)
+    pygame.draw.rect(window, pygame.Color('red'), exit_button, 2)
 
     button_font = pygame.font.Font(None, 50)
-    exit_text = button_font.render('Выйти', True, pygame.Color('white'))
+    exit_text = button_font.render('Выйти', True, pygame.Color('red'))
     window.blit(exit_text, [810, 510])
+    victory_sound.play()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if exit_button.collidepoint(event.pos):
+
                     terminate()
         pygame.display.flip()
         clock.tick(FPS)
@@ -498,7 +499,7 @@ def main():
     is_mouse_down = False
     is_jumped = False
 
-    window: pygame.Surface = pygame.display.set_mode(RESOLUTION, pygame.FULLSCREEN)
+    window: pygame.Surface = pygame.display.set_mode(RESOLUTION)
     pygame.display.set_caption('Gooks')
 
     clock = pygame.time.Clock()
@@ -616,6 +617,7 @@ def main():
             if not team.check_state():
                 teams.remove(team)
                 if len(teams) == 1:
+
                     win_screen(window, clock, teams[0])
         timer = (pygame.time.get_ticks() - turn_start_time) // 1000
         places_for_filling.append(((910, 10), (30, 50)))
