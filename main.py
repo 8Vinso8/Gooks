@@ -75,6 +75,11 @@ class Map:
         self.color_zero = color_zero
         self.color_one = color_one
         self.load_map_file(map_file)
+        try:
+            im = Image.open("data/fon.jpg")
+        except FileNotFoundError:
+            im = Image.open('data/fon.png')
+        self.pixels = im.load()
 
     def load_map_file(self, map_file):
         fullname = os.path.join('data', map_file)
@@ -86,14 +91,14 @@ class Map:
     def draw(self, window):
         for i in range(1920):
             for j in range(1080):
-                window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.color_zero)
+                window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.pixels[i, j])
 
     def draw_part(self, window, start, size):
         start = tuple(map(int, start))
         for i in range(start[0], start[0] + size[0] + 30):
             for j in range(start[1] - 20, start[1] + size[1]):
                 try:
-                    window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.color_zero)
+                    window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.pixels[i, j])
                 except IndexError:
                     continue
                 # Поменять цвета местами если баги
