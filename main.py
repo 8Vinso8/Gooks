@@ -26,6 +26,8 @@ def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name):
     window.blit(fps_text, [910, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
+    
+
 
 
 def terminate():
@@ -116,6 +118,7 @@ class Map:
                 (size * 2, size * 2)
             )
         )
+
 
     def get_bitmap(self):
         return self.bitmap
@@ -338,7 +341,7 @@ class Gook(Thing):
                     self.x_speed = collision_check - self.get_x()
                     if self.x_speed == 0:
                         for i in range(1, 20):
-                            collision_check = self.collision('left', kx=1, ky=i)
+                            collision_check = self.collision('left', kx=1, ky=i, speed=-1)
                             if not collision_check:
                                 self.move(-1, -i)
                                 break
@@ -376,6 +379,7 @@ class Gook(Thing):
             power
         )
         playing_sounds.append(shot_sound)
+
 
     def make_damage(self, dmg):
         self.hp -= dmg
