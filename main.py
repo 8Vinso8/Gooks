@@ -26,7 +26,7 @@ def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name):
     window.blit(fps_text, [910, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
-    
+
 
 def terminate():
     pygame.quit()
@@ -377,7 +377,6 @@ class Gook(Thing):
         )
         playing_sounds.append(shot_sound)
 
-
     def make_damage(self, dmg):
         self.hp -= dmg
 
@@ -486,7 +485,6 @@ def win_screen(window, clock, winner):
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if exit_button.collidepoint(event.pos):
-
                     terminate()
         pygame.display.flip()
         clock.tick(FPS)
@@ -499,7 +497,7 @@ def main():
     is_mouse_down = False
     is_jumped = False
 
-    window: pygame.Surface = pygame.display.set_mode(RESOLUTION)
+    window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
     pygame.display.set_caption('Gooks')
 
     clock = pygame.time.Clock()
@@ -611,13 +609,13 @@ def main():
                 if gook.check_state():
                     if gook == cur_gook:
                         next_turn()
+                    graveyards.append(gook.make_graveyard())
                     places_for_filling.append((gook.get_pos(), gook.get_size()))
                     team.remove_gook(gook)
                     playing_sounds.append(death_sound)
             if not team.check_state():
                 teams.remove(team)
                 if len(teams) == 1:
-
                     win_screen(window, clock, teams[0])
         timer = (pygame.time.get_ticks() - turn_start_time) // 1000
         places_for_filling.append(((910, 10), (30, 50)))
