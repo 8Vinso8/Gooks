@@ -19,10 +19,6 @@ def draw_interface(window, wind_num, timer, cur_team_name, cur_gook_name):
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
     
-    
-explode_sound = pygame.mixer.Sound('data/explode.wav')
-shot_sound = pygame.mixer.Sound('data/shot.wav')
-soundtrack = pygame.mixer.Sound('data/shot.wav')
 
 
 
@@ -456,6 +452,9 @@ def main():
     is_jumped = False
 
     pygame.init()
+    explode_sound = pygame.mixer.Sound('data/explode.wav')
+    shot_sound = pygame.mixer.Sound('data/shot.wav')
+    soundtrack = pygame.mixer.Sound('data/shot.wav')
     window: pygame.Surface = pygame.display.set_mode(RESOLUTION, pygame.FULLSCREEN)
     pygame.display.set_caption('Gooks')
 
