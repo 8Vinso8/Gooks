@@ -1,15 +1,21 @@
 RESOLUTION = 1920, 1080
 
+death_sound_way = 'death_sound.wav'
+explode_sound_way = 'explode_sound.wav'
+shot_sound_way = 'shot_sound.wav'
+soundtrack_way = 'soundtrack.wav'
+victory_sound_way = 'victory_sound.wav'
+
 GOOK_IMG = 'wait.png'
-GOOK_RES = (80, 64)
+GOOK_RES = (80, 80)
 MOVE1_IMG = 'move1.png'
-MOVE1_RES = (80, 76)
+MOVE1_RES = (80, 80)
 MOVE2_IMG = 'move2.png'
-MOVE2_RES = (80, 74)
+MOVE2_RES = (80, 80)
 SHOOT_FORWARD_IMG = 'shoot_forward.png'
-SHOOT_FORWARD_RES = (80, 68)
+SHOOT_FORWARD_RES = (80, 80)
 SHOOT_UP_IMG = 'shoot_up.png'
-SHOOT_UP_RES = (80, 70)
+SHOOT_UP_RES = (80, 80)
 
 CANNON_PROJ_IMG = 'cannon_proj.png'
 CANNON_PROJ_RES = (30, 14)
@@ -34,8 +40,10 @@ LASER_DMG = 50
 
 GRAVEYARD_IMG = 'graveyard.png'
 GRAVEYARD_RES = (53, 59)
+EXPLOSION_IMG = 'explosion.png'
+EXPLOSION_RES = (150, 150)
 
-PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 1, 50, 150, 60),
+PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 0.25, 20, 150, 60),
                'rifle': (RIFLE_PROJ_IMG, RIFLE_PROJ_RES, 0.2, 10, 5, 60),
                'grenade': (GRENADE_IMG, GRENADE_RES, 1, 2, 150, 40),
                'laser': (LASER_PROJ_IMG, LASER_PROJ_RES, 0, 20, 5, 40)}
@@ -59,6 +67,9 @@ moved_gooks = []
 bullets = []
 teams = []
 graveyards = []
+places_for_filling = []
+playing_sounds = []
+explosions = []
 cur_gook = None
 cur_team = None
 
