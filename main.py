@@ -6,6 +6,7 @@ import random
 import itertools
 import os
 import sys
+from PIL import Image
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)  # frequency, size, channels, buffersize
 pygame.init()
@@ -76,10 +77,15 @@ class Map:
         self.color_one = color_one
         self.load_map_file(map_file)
         try:
-            im = Image.open("data/fon.jpg")
+            im = Image.open("data/ground.jpg")
         except FileNotFoundError:
-            im = Image.open('data/fon.png')
+            im = Image.open('data/ground.png')
         self.pixels = im.load()
+        try:
+            im1 = Image.open('data/fon.jpg')
+        except FileNotFoundError:
+            im1 = Image.open('data/fon.png')
+        self.pixels1 = im1.load()
 
     def load_map_file(self, map_file):
         fullname = os.path.join('data', map_file)
@@ -91,17 +97,17 @@ class Map:
     def draw(self, window):
         for i in range(1920):
             for j in range(1080):
-                window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.pixels[i, j])
+                window.set_at((i, j), self.pixels[i, j] if self.bitmap[j][i] else self.pixels1[i, j])
 
     def draw_part(self, window, start, size):
         start = tuple(map(int, start))
         for i in range(start[0], start[0] + size[0] + 30):
             for j in range(start[1] - 20, start[1] + size[1]):
                 try:
-                    window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.pixels[i, j])
+                    window.set_at((i, j), self.pixels[i, j] if self.bitmap[j][i] else self.pixels1[i, j])
                 except IndexError:
                     continue
-                # Поменять цвета местами если баги
+
 
     def explode(self, window, point, size):
         point = tuple(map(round, point))
@@ -109,7 +115,7 @@ class Map:
             for j in range(point[1] - size, point[1] + size):
                 try:
                     self.bitmap[j][i] = 0
-                    window.set_at((i, j), self.color_one if self.bitmap[j][i] else self.color_zero)
+                    window.set_at((i, j), self.pixels[i, j] if self.bitmap[j][i] else self.pixels1[i, j])
                 except IndexError:
                     continue
         explode_sound.play()
