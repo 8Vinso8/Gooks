@@ -1,4 +1,6 @@
 RESOLUTION = 1920, 1080
+BACKGROUND_IMG = 'background.png'
+GROUND_IMG = 'ground.png'
 
 death_sound_way = 'death_sound.wav'
 explode_sound_way = 'explode_sound.wav'
@@ -12,7 +14,7 @@ MOVE1_IMG = 'move1.png'
 MOVE1_RES = (80, 80)
 MOVE2_IMG = 'move2.png'
 MOVE2_RES = (80, 80)
-SHOOT_FORWARD_IMG = 'shoot_forward.png'
+SHOOT_FORWARD_IMG = 'shoot_front.png'
 SHOOT_FORWARD_RES = (80, 80)
 SHOOT_UP_IMG = 'shoot_up.png'
 SHOOT_UP_RES = (80, 80)
@@ -43,6 +45,7 @@ GRAVEYARD_RES = (53, 59)
 EXPLOSION_IMG = 'explosion.png'
 EXPLOSION_RES = (150, 150)
 
+
 PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 0.25, 20, 150, 60),
                'rifle': (RIFLE_PROJ_IMG, RIFLE_PROJ_RES, 0.2, 10, 5, 60),
                'grenade': (GRENADE_IMG, GRENADE_RES, 1, 2, 150, 40),
@@ -57,7 +60,7 @@ TEAMS = [['BTS', 'blue', [(0, 0)], ('ChiMin',)],
          ['ANIME', 'white', [(1700, 0)], ('Hidetaka',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
-FPS = 60
+FPS = 30
 
 G = 1
 

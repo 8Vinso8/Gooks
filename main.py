@@ -76,16 +76,12 @@ class Map:
         self.color_zero = color_zero
         self.color_one = color_one
         self.load_map_file(map_file)
-        try:
-            im = Image.open("data/ground.jpg")
-        except FileNotFoundError:
-            im = Image.open('data/ground.png')
-        self.pixels = im.load()
-        try:
-            im1 = Image.open('data/fon.jpg')
-        except FileNotFoundError:
-            im1 = Image.open('data/fon.png')
-        self.pixels1 = im1.load()
+        fullname = os.path.join('data', GROUND_IMG)
+        ground_img = Image.open(fullname)
+        self.pixels1 = ground_img.load()
+        fullname = os.path.join('data', BACKGROUND_IMG)
+        background_img = Image.open(fullname)
+        self.pixels0 = background_img.load()
 
     def load_map_file(self, map_file):
         fullname = os.path.join('data', map_file)
@@ -95,29 +91,31 @@ class Map:
                 self.bitmap.append(line_list)
 
     def draw(self, window):
-        for i in range(1920):
-            for j in range(1080):
-                window.set_at((i, j), self.pixels[i, j] if self.bitmap[j][i] else self.pixels1[i, j])
+        self.draw_part(window, (0, 0), RESOLUTION)
 
     def draw_part(self, window, start, size):
         start = tuple(map(int, start))
         for i in range(start[0], start[0] + size[0] + 30):
             for j in range(start[1] - 20, start[1] + size[1]):
                 try:
-                    window.set_at((i, j), self.pixels[i, j] if self.bitmap[j][i] else self.pixels1[i, j])
+                    bit = self.bitmap[j][i]
                 except IndexError:
                     continue
-
+                pixel_one = self.pixels1[i, j]
+                pixel_zero = self.pixels0[i, j]
+                window.set_at((i, j), pixel_one if bit else pixel_zero)
 
     def explode(self, window, point, size):
         point = tuple(map(round, point))
         for i in range(point[0] - size, point[0] + size):
             for j in range(point[1] - size, point[1] + size):
-                try:
-                    self.bitmap[j][i] = 0
-                    window.set_at((i, j), self.pixels[i, j] if self.bitmap[j][i] else self.pixels1[i, j])
-                except IndexError:
-                    continue
+                if math.sqrt((point[0] - i)**2 + (point[1] - j)**2) <= size:
+                    try:
+                        self.bitmap[j][i] = 0
+                    except IndexError:
+                        continue
+                    pixel_zero = self.pixels0[i, j]
+                    window.set_at((i, j), pixel_zero)
         explode_sound.play()
         explosions.append(
             Explosion(
@@ -154,12 +152,16 @@ class Thing:
     def get_pos(self):
         return self.position
 
+    def get_image_name(self):
+        return self.image_name
+
     def change_speed(self, change):  # change - кортеж изменения скорости (x, y)
         self.x_speed += change[0]
         self.y_speed += change[1]
 
     def change_image(self, image):
         self.image = load_image(image, colorkey=-1)
+        self.image_name = image
 
     def change_size(self, size):
         self.size = size
@@ -307,6 +309,7 @@ class Gook(Thing):
         self.speed_decrease = 0.5  # Замедление
         self.hp = 100
         self.angle = 0
+        self.move_img_delay = 0
 
     def __str__(self):
         return self.name
@@ -359,7 +362,7 @@ class Gook(Thing):
         self.x_speed = 0
 
         if self.direction != last_direction:
-            self.image = pygame.transform.flip(self.image, True, False)
+            self.flip_x()
         return last_pos
 
     def jump(self):
@@ -387,6 +390,24 @@ class Gook(Thing):
             power
         )
         playing_sounds.append(shot_sound)
+
+    def flip_x(self):
+        self.image = pygame.transform.flip(self.image, True, False)
+
+    def change_image_state(self, image):
+        super().change_image(image)
+        if self.direction == 'left':
+            self.flip_x()
+
+    def change_move_image(self):
+        if self.move_img_delay > 5:
+            if self.image_name == MOVE2_IMG:
+                self.change_image_state(MOVE1_IMG)
+            else:
+                self.change_image_state(MOVE2_IMG)
+            self.move_img_delay = 0
+        else:
+            self.move_img_delay += 1
 
     def make_damage(self, dmg):
         self.hp -= dmg
@@ -507,8 +528,9 @@ def main():
     is_shot = False
     is_mouse_down = False
     is_jumped = False
+    were_walking = False
 
-    window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
+    window: pygame.Surface = pygame.display.set_mode(RESOLUTION)
     pygame.display.set_caption('Gooks')
 
     clock = pygame.time.Clock()
@@ -551,14 +573,14 @@ def main():
             if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN:
                 start_ticks = pygame.time.get_ticks()
                 is_mouse_down = True
-                cur_gook.change_image(SHOOT_FORWARD_IMG)
+                cur_gook.change_image_state(SHOOT_FORWARD_IMG)
             if is_mouse_down and event.type == MOUSEMOTION:
                 angle = cur_gook.change_get_angle(event.pos)
-                if angle > 1:
-                    cur_gook.change_image(SHOOT_FORWARD_IMG)
+                if 0.04 < angle < 3.12:
+                    cur_gook.change_image_state(SHOOT_FORWARD_IMG)
                     cur_gook.change_size(SHOOT_FORWARD_RES)
                 else:
-                    cur_gook.change_image(SHOOT_UP_IMG)
+                    cur_gook.change_image_state(SHOOT_UP_IMG)
                     cur_gook.change_size(SHOOT_UP_RES)
             if is_mouse_down and event.type == MOUSEBUTTONUP:
                 time = pygame.time.get_ticks() - start_ticks
@@ -567,19 +589,21 @@ def main():
                 power = time / 3000 + 0.1
                 bullets.append(cur_gook.shoot(event.pos, power))
                 is_mouse_down = False
-                cur_gook.change_image(GOOK_IMG)
+                cur_gook.change_image_state(GOOK_IMG)
                 cur_gook.change_size(GOOK_RES)
 
         if not is_jumped:
             keys = pygame.key.get_pressed()
-            if keys[K_a]:
+            if keys[K_a] and not is_shot:
                 key_move_last_pos = cur_gook.key_move('A')
                 places_for_filling.append((key_move_last_pos, cur_gook.get_size()))
                 moved_gooks.append(cur_gook)
-            if keys[K_d]:
+                were_walking = True
+            if keys[K_d] and not is_shot:
                 key_move_last_pos = cur_gook.key_move('D')
                 places_for_filling.append((key_move_last_pos, cur_gook.get_size()))
                 moved_gooks.append(cur_gook)
+                were_walking = True
         if cur_gook.collision('down'):
             is_jumped = False
 
@@ -605,6 +629,7 @@ def main():
 
             if state:
                 bullets.remove(bullet)
+                is_shot = False
                 next_turn()
                 places_for_filling.append(((0, 10), (30, 50)))
                 places_for_filling.append(((1700, 10), (175, 100)))
@@ -636,6 +661,12 @@ def main():
                 explosions.remove(explosion)
                 places_for_filling.append((explosion.get_pos(), explosion.get_size()))
 
+        if were_walking:
+            cur_gook.change_move_image()
+        elif cur_gook.get_image_name() != SHOOT_FORWARD_IMG and cur_gook.get_image_name() != SHOOT_UP_IMG:
+            cur_gook.change_image_state(GOOK_IMG)
+        places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
+
         for place, size in places_for_filling:
             map1.draw_part(window, place, size)
         places_for_filling.clear()
@@ -660,11 +691,14 @@ def main():
             shot_sound.play()
         playing_sounds.clear()
         moved_gooks.clear()
+        were_walking = False
         time_passed = pygame.time.get_ticks() - timer_fps
-        fps = 1000 // time_passed
         if time_passed < 1000 // FPS:
             pygame.time.wait(1000 // FPS - time_passed)
+        time_passed = pygame.time.get_ticks() - timer_fps
+        fps = 1000 // time_passed
         draw_interface(window, wind, fps, cur_team, cur_gook)
+
         pygame.display.flip()
 
 

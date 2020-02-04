@@ -1,16 +1,16 @@
 from PIL import Image
 try:
-    im = Image.open("map.jpg")
+    im = Image.open("data/map.jpg")
 except FileNotFoundError:
-    im = Image.open('map.png')
-f = open('map.txt', mode='w')
+    im = Image.open('data/map.png')
+f = open('data/map.txt', mode='w')
 pixels = im.load()
 x, y = im.size
 current_line = ''
 for i in range(y):
     for j in range(x):
-        r, g, b, w = pixels[j, i]
-        if not r and not g and not b:
+        r, g, b = pixels[j, i]
+        if not (r or g or b):
             current_line += '1'
         else:
             current_line += '0'
