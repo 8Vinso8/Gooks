@@ -62,7 +62,6 @@ G = 1
 
 MOVEMENT_SPEED = 5
 wind = 0
-moved_gooks = []
 bullets = []
 teams = []
 graveyards = []
