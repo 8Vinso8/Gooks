@@ -6,6 +6,7 @@ from bitmap import Bitmap
 from team import Team
 from functions import *
 from locals import *
+from interface import *
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)  # frequency, size, channels, buffersize
 pygame.init()
@@ -50,6 +51,8 @@ def main():
 
     window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
     pygame.display.set_caption('Gooks')
+    
+    wind_indicator = WindIndicator((0, 0))
 
     clock = pygame.time.Clock()
 
@@ -221,7 +224,7 @@ def main():
             pygame.time.wait(1000 // FPS - time_passed)
         time_passed = pygame.time.get_ticks() - timer_fps
         fps = 1000 // time_passed
-        draw_interface(window, wind, fps, cur_team, cur_gook)
+        draw_interface(window, wind, fps, cur_team, cur_gook, wind_indicator)
 
         pygame.display.flip()
 
