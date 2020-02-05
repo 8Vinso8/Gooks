@@ -6,7 +6,7 @@ from locals import *
 import random
 
 
-def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name):
+def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name, wind_indicator):
     font = pygame.font.Font(None, 50)
     wind_text = font.render(str(wind_num), True, pygame.Color('white'))
     fps_text = font.render(str(fps), True, pygame.Color('white'))
@@ -16,6 +16,7 @@ def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name):
     window.blit(fps_text, [910, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
+    window.blit(wind_indicator.get_image(wind_num), wind_indicator.get_pos())
 
 
 def terminate():
