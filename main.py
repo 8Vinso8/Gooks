@@ -15,8 +15,14 @@ sounds = {
     'death_sound': pygame.mixer.Sound(os.path.join('data', death_sound_way)),
     'shot_sound': pygame.mixer.Sound(os.path.join('data', shot_sound_way)),
     'explode_sound': pygame.mixer.Sound(os.path.join('data', explode_sound_way)),
-    'victory_sound': pygame.mixer.Sound(os.path.join('data', victory_sound_way))
+    'victory_sound': pygame.mixer.Sound(os.path.join('data', victory_sound_way)),
+    'turn_sounds': (pygame.mixer.Sound(os.path.join('data', gook_sounds[0])),
+                    pygame.mixer.Sound(os.path.join('data', gook_sounds[1])),
+                    pygame.mixer.Sound(os.path.join('data', gook_sounds[2])))
 }
+
+for i in sounds['turn_sounds']:
+    i.set_volume(2)
 
 
 def get_next_team():
@@ -71,6 +77,7 @@ def main():
             gook.draw(window)
     sounds['soundtrack'].play(-1)
     while is_working:
+        cur_gook.is_weapon = True
         timer_fps = pygame.time.get_ticks()
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -95,12 +102,11 @@ def main():
                     jump_last_pos = cur_gook.jump2()
                     places_for_filling.append((jump_last_pos, cur_gook.get_size()))
 
-            if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN:
+            if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN and event.button == 1:
                 cur_gook.change_holding_status()
                 start_ticks = pygame.time.get_ticks()
                 is_mouse_down = True
                 cur_gook.change_image_state(SHOOT_FORWARD_IMG)
-                cur_gook.is_weapon = True
             if is_mouse_down and event.type == MOUSEMOTION:
                 angle = cur_gook.change_get_angle(event.pos)
                 if -1.67 < angle < 1.67:
@@ -113,7 +119,7 @@ def main():
                     cur_gook.change_image_state(SHOOT_UP_IMG)
                 cur_gook.draw(window)
 
-            if is_mouse_down and event.type == MOUSEBUTTONUP:
+            if is_mouse_down and event.type == MOUSEBUTTONUP and event.button == 1:
                 cur_gook.change_holding_status()
                 time = pygame.time.get_ticks() - start_ticks
                 if time > 2700:
@@ -125,7 +131,9 @@ def main():
                 cur_gook.change_size(GOOK_RES)
                 places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
                 playing_sounds.append(sounds['shot_sound'])
-                cur_gook.is_weapon = False
+
+            if not is_mouse_down and event.type == MOUSEBUTTONUP and event.button == 3:
+                cur_gook.change_weapon()
 
         if not bullets and not is_mouse_down and not is_jumped:
             keys = pygame.key.get_pressed()
@@ -151,7 +159,8 @@ def main():
         # Отрисовка и проверка состояния пуль
         for bullet in bullets:
             bullet_last_pos = bullet.move()
-            state = bullet.check_state()
+            state = bullet.check_state(teams)
+            bullet.change_wind(wind)
             if state == 'BOOM':
                 boom_rect = bullet.boom(window)
                 for team in teams:
@@ -162,7 +171,10 @@ def main():
 
             if state:
                 bullets.remove(bullet)
+                cur_gook.is_weapon = False
                 next_turn()
+                if random.randint(0, 2) == 2:
+                    playing_sounds.append(random.choice(sounds['turn_sounds']))
                 places_for_filling.append(((0, 10), (30, 50)))
                 places_for_filling.append(((1700, 10), (175, 100)))
             places_for_filling.append((bullet_last_pos, bullet.get_size()))
@@ -212,14 +224,8 @@ def main():
         for explosion in explosions:
             explosion.draw(window)
             explosion.increase_life_timer()
-        if sounds['victory_sound'] in playing_sounds:
-            sounds['victory_sound'].play()
-        elif sounds['death_sound'] in playing_sounds:
-            sounds['death_sound'].play()
-        elif sounds['explode_sound'] in playing_sounds:
-            sounds['explode_sound'].play()
-        elif sounds['shot_sound'] in playing_sounds:
-            sounds['shot_sound'].play()
+        if playing_sounds:
+            playing_sounds[-1].play()
         playing_sounds.clear()
         were_walking = False
         time_passed = pygame.time.get_ticks() - timer_fps
@@ -228,7 +234,6 @@ def main():
         time_passed = pygame.time.get_ticks() - timer_fps
         fps = 1000 // time_passed
         draw_interface(window, wind, fps, cur_team, cur_gook, wind_indicator)
-
         pygame.display.flip()
 
 

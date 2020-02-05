@@ -11,7 +11,8 @@ class Bullet(Thing):
             self.flip_x()
         self.g = PROJECTILES[weapon][2] * G
         speed = PROJECTILES[weapon][3] * power
-        self.x_speed = speed * math.cos(angle) + wind
+        self.wind = 0
+        self.x_speed = speed * math.cos(angle)
         self.y_speed = speed * math.sin(angle)
         self.explosion = PROJECTILES[weapon][4]
         self.dmg = PROJECTILES[weapon][5]
@@ -26,12 +27,20 @@ class Bullet(Thing):
     def get_dmg(self):
         return self.dmg
 
-    def check_state(self):
+    def check_state(self, teams):
         if super().check_state():
             return super().check_state()
         if self.collision('left', self.x_speed) or self.collision('right', self.x_speed) \
                 or self.collision('down', self.y_speed) or self.collision('up', self.y_speed):
             return 'BOOM'
+        '''for team in teams:
+            for gook in team.get_gooks():
+                if pygame.Rect(
+                        gook.get_pos(), gook.get_size()
+                ).colliderect(
+                        pygame.Rect(self.get_pos(), self.get_size())
+                ):
+                    return 'BOOM'''
         # Проверка столкновения
 
     def boom(self, window):
@@ -45,3 +54,7 @@ class Bullet(Thing):
              self.get_y() + self.get_size()[1] // 2 - self.explosion),
             (2 * self.explosion, 2 * self.explosion)
         )
+
+    def change_wind(self, wind):
+        self.x_speed = self.x_speed - self.wind + wind
+        self.wind = wind

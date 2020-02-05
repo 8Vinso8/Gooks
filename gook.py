@@ -5,6 +5,7 @@ from locals import *
 from graveyard import Graveyard
 from bullet import Bullet
 from weapon import Weapon
+import itertools
 
 
 class Gook(Thing):
@@ -23,6 +24,7 @@ class Gook(Thing):
         self.holding = False
         self.weapon_name = weapon
         self.weapon = Weapon(bitmap, position, *WEAPONS[weapon], self.direction, self.angle)
+        self.weapon_gen = itertools.cycle(self.get_next_weapon())
 
     def __str__(self):
         return self.name
@@ -50,6 +52,10 @@ class Gook(Thing):
     def get_hp(self):
         return self.hp
 
+    def get_next_weapon(self):
+        for weapon_now in WEAPONS:
+            yield weapon_now
+
     def change_holding_status(self):
         self.holding = not self.holding
         if self.holding:
@@ -61,6 +67,10 @@ class Gook(Thing):
             self.weapon.flip_x()
         self.direction = direction
         self.get_weapon().direction = direction
+
+    def change_weapon(self):
+        self.weapon_name = next(self.weapon_gen)
+        self.weapon = Weapon(self.bitmap, self.position, *WEAPONS[self.weapon_name], self.direction, self.angle)
 
     def key_move(self, move):
         last_pos = self.get_pos()

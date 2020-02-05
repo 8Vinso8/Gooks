@@ -1,3 +1,6 @@
+from thing import Thing
+
+
 class Medicine(Thing):
     def __init__(self, bitmap, position, start_image, size):
         super().__init__(bitmap, position, start_image, size)

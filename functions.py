@@ -8,11 +8,9 @@ import random
 
 def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name, wind_indicator):
     font = pygame.font.Font(None, 50)
-    wind_text = font.render(str(wind_num), True, pygame.Color('white'))
     fps_text = font.render(str(fps), True, pygame.Color('white'))
     cur_team_text = font.render(str(cur_team_name), True, pygame.Color('white'))
     cur_gook_text = font.render(str(cur_gook_name), True, pygame.Color('white'))
-    window.blit(wind_text, [10, 10])
     window.blit(fps_text, [910, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
