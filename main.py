@@ -84,8 +84,13 @@ def main():
                     is_working = False
                 if event.key == K_SPACE:
                     is_jumped = True
-                    jump_last_pos = cur_gook.jump()
-                    places_for_filling.append(((jump_last_pos[0], jump_last_pos[1] - 30), cur_gook.get_size()))
+                    jump_last_pos = cur_gook.jump1()
+                    places_for_filling.append((jump_last_pos, cur_gook.get_size()))
+
+                if event.key == K_RETURN:
+                    is_jumped = True
+                    jump_last_pos = cur_gook.jump2()
+                    places_for_filling.append((jump_last_pos, cur_gook.get_size()))
 
             if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN:
                 cur_gook.change_holding_status()

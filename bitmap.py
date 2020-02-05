@@ -32,7 +32,7 @@ class Bitmap:
     def draw_part(self, window, start, size):
         start = tuple(map(int, start))
         for i in range(start[0], start[0] + size[0] + 30):
-            for j in range(start[1] - 20, start[1] + size[1]):
+            for j in range(start[1] - 30, start[1] + size[1]):
                 try:
                     bit = self.bitmap[j][i]
                 except IndexError:

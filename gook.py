@@ -90,13 +90,22 @@ class Gook(Thing):
             self.flip_x()
         return last_pos
 
-    def jump(self):
+    def jump1(self):
         last_pos = self.get_pos()
         if self.collision('down'):
             if self.direction == 'left':
                 self.change_speed((10, -20))
             else:
                 self.change_speed((-10, -20))
+        return last_pos
+
+    def jump2(self):
+        last_pos = self.get_pos()
+        if self.collision('down'):
+            if self.direction == 'left':
+                self.change_speed((-20, -15))
+            else:
+                self.change_speed((20, -15))
         return last_pos
 
     def change_get_angle(self, final_cords):
