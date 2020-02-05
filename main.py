@@ -59,7 +59,6 @@ n_gook = next(gook_gen)
 def next_turn():
     global cur_team, cur_gook, team_gen, n_gook, wind
     wind = random.randint(-3, 3)
-    print(wind)
     try:
         cur_team = next(team_gen)
         cur_gook = cur_team.get_gook(n_gook)
@@ -172,9 +171,11 @@ class Thing:
     def check_state(self):
         if self.get_x() >= RESOLUTION[0] or \
                 self.get_y() >= RESOLUTION[1] or \
-                self.get_x() + self.get_size()[0] < 0 or \
-                self.get_y() + self.get_size()[1] < 0:
+                self.get_x() + self.get_size()[0] < 0:
             return 'delete'
+
+    def flip_x(self):
+        self.image = pygame.transform.flip(self.image, True, False)
 
     def draw(self, window):
         self.rect = self.image.get_rect(
@@ -258,14 +259,17 @@ class Thing:
 
 
 class Bullet(Thing):
-    def __init__(self, bitmap, pos, weapon, angle, power):
+    def __init__(self, bitmap, pos, weapon, angle, power, direction):
         super().__init__(bitmap, pos, PROJECTILES[weapon][0], PROJECTILES[weapon][1])
+        if direction == 'left':
+            self.flip_x()
         self.g = PROJECTILES[weapon][2] * G
         speed = PROJECTILES[weapon][3] * power
         self.x_speed = speed * math.cos(angle) + wind
         self.y_speed = speed * math.sin(angle)
         self.explosion = PROJECTILES[weapon][4]
         self.dmg = PROJECTILES[weapon][5]
+        self.direction = direction
 
     def move(self):
         last_pos = self.get_pos()
@@ -310,6 +314,7 @@ class Gook(Thing):
         self.hp = 100
         self.angle = 0
         self.move_img_delay = 0
+        self.is_weapon = False
         self.holding = False
 
     def __str__(self):
@@ -322,6 +327,8 @@ class Gook(Thing):
         name_text = font.render(self.name, True, pygame.Color(self.color))
         window.blit(hp_text, [self.position[0], self.position[1] - 10])
         window.blit(name_text, [self.position[0], self.position[1] - 20])
+        '''if self.is_weapon:
+            self.weapon.draw()'''
         if self.holding:
             time = pygame.time.get_ticks() - self.start_ticks
             if time > 2700:
@@ -394,18 +401,16 @@ class Gook(Thing):
         return self.angle
 
     def shoot(self, final_cords, power):
-        self.change_get_angle(final_cords)
+        print(self.change_get_angle(final_cords))
+        playing_sounds.append(shot_sound)
         return Bullet(
             self.bitmap,
             (self.get_x() + self.get_size()[0] // 2, self.get_y() + self.get_size()[1] // 2),
             self.get_weapon(),
             self.angle,
-            power
+            power,
+            self.direction
         )
-        playing_sounds.append(shot_sound)
-
-    def flip_x(self):
-        self.image = pygame.transform.flip(self.image, True, False)
 
     def change_image_state(self, image):
         super().change_image(image)
@@ -452,6 +457,16 @@ class Explosion(Thing):
     def check_state(self):
         if self.life_timer >= 10:
             return 'del'
+
+
+class Weapon(Thing):
+    def __init__(self, bitmap, gook, image, size):
+        super().__init__(bitmap, gook.get_pos(), image, size)
+
+    def rotate(self, angle):
+        self.image = pygame.transform.rotate(self.image, angle)
+
+    
 
 
 class Team:
@@ -538,12 +553,11 @@ def win_screen(window, clock, winner):
 def main():
     is_working = True
     fullscreen = True
-    is_shot = False
     is_mouse_down = False
     is_jumped = False
     were_walking = False
 
-    window: pygame.Surface = pygame.display.set_mode(RESOLUTION)
+    window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
     pygame.display.set_caption('Gooks')
 
     clock = pygame.time.Clock()
@@ -590,12 +604,15 @@ def main():
                 cur_gook.change_image_state(SHOOT_FORWARD_IMG)
             if is_mouse_down and event.type == MOUSEMOTION:
                 angle = cur_gook.change_get_angle(event.pos)
-                if 0.04 < angle < 3.12:
+                if -1.67 < angle < 1.67:
+                    cur_gook.direction = 'right'
+                else:
+                    cur_gook.direction = 'left'
+                if 0 < angle < 3.14:
                     cur_gook.change_image_state(SHOOT_FORWARD_IMG)
-                    cur_gook.change_size(SHOOT_FORWARD_RES)
                 else:
                     cur_gook.change_image_state(SHOOT_UP_IMG)
-                    cur_gook.change_size(SHOOT_UP_RES)
+
             if is_mouse_down and event.type == MOUSEBUTTONUP:
                 cur_gook.change_holding_status()
                 time = pygame.time.get_ticks() - start_ticks
@@ -608,17 +625,15 @@ def main():
                 cur_gook.change_size(GOOK_RES)
                 places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
 
-        if not is_jumped:
+        if not bullets and not is_mouse_down and not is_jumped:
             keys = pygame.key.get_pressed()
-            if keys[K_a] and not is_shot:
+            if keys[K_a]:
                 key_move_last_pos = cur_gook.key_move('A')
                 places_for_filling.append((key_move_last_pos, cur_gook.get_size()))
-                moved_gooks.append(cur_gook)
                 were_walking = True
-            if keys[K_d] and not is_shot:
+            if keys[K_d]:
                 key_move_last_pos = cur_gook.key_move('D')
                 places_for_filling.append((key_move_last_pos, cur_gook.get_size()))
-                moved_gooks.append(cur_gook)
                 were_walking = True
         if cur_gook.collision('down'):
             is_jumped = False
@@ -645,7 +660,6 @@ def main():
 
             if state:
                 bullets.remove(bullet)
-                is_shot = False
                 next_turn()
                 places_for_filling.append(((0, 10), (30, 50)))
                 places_for_filling.append(((1700, 10), (175, 100)))
@@ -657,7 +671,6 @@ def main():
                 last_pos_or_none = gook.passive_move()
                 if last_pos_or_none:
                     places_for_filling.append((last_pos_or_none, gook.get_size()))
-                    moved_gooks.append(gook)
                 if gook.check_state():
                     if gook == cur_gook:
                         next_turn()
@@ -706,7 +719,6 @@ def main():
         elif shot_sound in playing_sounds:
             shot_sound.play()
         playing_sounds.clear()
-        moved_gooks.clear()
         were_walking = False
         time_passed = pygame.time.get_ticks() - timer_fps
         if time_passed < 1000 // FPS:

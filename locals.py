@@ -9,15 +9,11 @@ soundtrack_way = 'soundtrack.wav'
 victory_sound_way = 'victory_sound.wav'
 
 GOOK_IMG = 'wait.png'
-GOOK_RES = (80, 80)
 MOVE1_IMG = 'move1.png'
-MOVE1_RES = (80, 80)
 MOVE2_IMG = 'move2.png'
-MOVE2_RES = (80, 80)
 SHOOT_FORWARD_IMG = 'shoot_front.png'
-SHOOT_FORWARD_RES = (80, 80)
 SHOOT_UP_IMG = 'shoot_up.png'
-SHOOT_UP_RES = (80, 80)
+GOOK_RES = (80, 80)
 
 CANNON_PROJ_IMG = 'cannon_proj.png'
 CANNON_PROJ_RES = (30, 14)
@@ -29,7 +25,7 @@ LASER_PROJ_RES = (100, 100)
 GRENADE_IMG = 'grenade.png'
 GRENADE_RES = (100, 100)
 CANNON_IMG = 'cannon.png'
-CANNON_RES = (100, 100)
+CANNON_RES = (60, 22)
 RIFLE_IMG = 'rifle.png'
 RIFLE_RES = (100, 100)
 LASER_IMG = 'laser.png'
