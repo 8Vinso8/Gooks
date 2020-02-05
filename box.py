@@ -3,5 +3,5 @@ class Medicine(Thing):
         super().__init__(bitmap, position, start_image, size)
         self.heal = 40
 
-    def get_heal(self):
+    def get_heal_number(self):
         return self.heal
