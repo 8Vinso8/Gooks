@@ -4,6 +4,7 @@ import math
 from locals import *
 from graveyard import Graveyard
 from bullet import Bullet
+from weapon import Weapon
 
 
 class Gook(Thing):
@@ -11,7 +12,6 @@ class Gook(Thing):
         super().__init__(bitmap, position, start_image, size)
         self.name = name
         self.color = color
-        self.weapon = weapon
         self.direction = 'right'
         self.x_speed = 0  # Только для перемещения без участия игрока!
         self.y_speed = 0
@@ -21,6 +21,8 @@ class Gook(Thing):
         self.move_img_delay = 0
         self.is_weapon = False
         self.holding = False
+        self.weapon_name = weapon
+        self.weapon = Weapon(bitmap, position, *WEAPONS[weapon], self.direction, self.angle)
 
     def __str__(self):
         return self.name
@@ -32,8 +34,8 @@ class Gook(Thing):
         name_text = font.render(self.name, True, pygame.Color(self.color))
         window.blit(hp_text, [self.position[0], self.position[1] - 10])
         window.blit(name_text, [self.position[0], self.position[1] - 20])
-        '''if self.is_weapon:
-            self.weapon.draw()'''
+        if self.is_weapon:
+            self.weapon.draw(window)
         if self.holding:
             time = pygame.time.get_ticks() - self.start_ticks
             if time > 2700:
@@ -53,13 +55,19 @@ class Gook(Thing):
         if self.holding:
             self.start_ticks = pygame.time.get_ticks()
 
+    def change_direction(self, direction):
+        if self.direction != direction:
+            self.flip_x()
+            self.weapon.flip_x()
+        self.direction = direction
+        self.get_weapon().direction = direction
+
     def key_move(self, move):
-        last_direction = self.direction
         last_pos = self.get_pos()
         if self.collision('down'):
             if move == 'D':
                 self.x_speed = MOVEMENT_SPEED
-                self.direction = 'right'
+                self.change_direction('right')
                 collision_check = self.collision('right', self.x_speed)
                 if collision_check:
                     self.x_speed = collision_check - self.get_x() - self.size[0]
@@ -71,7 +79,7 @@ class Gook(Thing):
                                 break
             else:
                 self.x_speed = -MOVEMENT_SPEED
-                self.direction = 'left'
+                self.change_direction('left')
                 collision_check = self.collision('left', self.x_speed)
                 if collision_check:
                     self.x_speed = collision_check - self.get_x()
@@ -86,8 +94,6 @@ class Gook(Thing):
 
         self.x_speed = 0
 
-        if self.direction != last_direction:
-            self.flip_x()
         return last_pos
 
     def jump1(self):
@@ -112,6 +118,7 @@ class Gook(Thing):
         fin_x, fin_y = final_cords
         st_x, st_y = self.get_x() + self.get_size()[0] // 2, self.get_y() + self.get_size()[1] // 2
         self.angle = math.atan2((fin_y - st_y), (fin_x - st_x))
+        '''self.weapon.rotate(self.angle)'''
         return self.angle
 
     def shoot(self, final_cords, power):
@@ -120,7 +127,7 @@ class Gook(Thing):
         return Bullet(
             self.bitmap,
             (self.get_x() + self.get_size()[0] // 2, self.get_y() + self.get_size()[1] // 2),
-            self.get_weapon(),
+            self.weapon_name,
             self.angle,
             power,
             self.direction

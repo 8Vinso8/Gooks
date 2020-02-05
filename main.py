@@ -97,16 +97,18 @@ def main():
                 start_ticks = pygame.time.get_ticks()
                 is_mouse_down = True
                 cur_gook.change_image_state(SHOOT_FORWARD_IMG)
+                cur_gook.is_weapon = True
             if is_mouse_down and event.type == MOUSEMOTION:
                 angle = cur_gook.change_get_angle(event.pos)
                 if -1.67 < angle < 1.67:
-                    cur_gook.direction = 'right'
+                    cur_gook.change_direction('right')
                 else:
-                    cur_gook.direction = 'left'
+                    cur_gook.change_direction('left')
                 if 0 < angle < 3.14:
                     cur_gook.change_image_state(SHOOT_FORWARD_IMG)
                 else:
                     cur_gook.change_image_state(SHOOT_UP_IMG)
+                cur_gook.draw(window)
 
             if is_mouse_down and event.type == MOUSEBUTTONUP:
                 cur_gook.change_holding_status()
@@ -120,6 +122,7 @@ def main():
                 cur_gook.change_size(GOOK_RES)
                 places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
                 playing_sounds.append(sounds['shot_sound'])
+                cur_gook.is_weapon = False
 
         if not bullets and not is_mouse_down and not is_jumped:
             keys = pygame.key.get_pressed()
@@ -159,7 +162,6 @@ def main():
                 next_turn()
                 places_for_filling.append(((0, 10), (30, 50)))
                 places_for_filling.append(((1700, 10), (175, 100)))
-                turn_start_time = pygame.time.get_ticks()
             places_for_filling.append((bullet_last_pos, bullet.get_size()))
         # Проверка непроизвольного движения гуков
         for team in teams:
@@ -174,6 +176,7 @@ def main():
                     places_for_filling.append((gook.get_pos(), gook.get_size()))
                     team.remove_gook(gook)
                     playing_sounds.append(sounds['death_sound'])
+                gook.get_weapon().set_pos(gook.get_pos())
             if not team.check_state():
                 teams.remove(team)
                 if len(teams) == 1:

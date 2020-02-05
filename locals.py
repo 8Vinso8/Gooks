@@ -41,11 +41,12 @@ GRAVEYARD_RES = (53, 59)
 EXPLOSION_IMG = 'explosion.png'
 EXPLOSION_RES = (150, 150)
 
-
-PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 0.25, 20, 150, 60),
-               'rifle': (RIFLE_PROJ_IMG, RIFLE_PROJ_RES, 0.2, 10, 5, 60),
+# оружие: изображение снаряда, размер изображения, множитель G, макс. скорость, радиус взрыва, урон
+PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 0.25, 20, 150, 30),
+               'rifle': (RIFLE_PROJ_IMG, RIFLE_PROJ_RES, 0.1, 50, 5, 40),
                'grenade': (GRENADE_IMG, GRENADE_RES, 1, 2, 150, 40),
                'laser': (LASER_PROJ_IMG, LASER_PROJ_RES, 0, 20, 5, 40)}
+
 WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
            'rifle': (RIFLE_IMG, RIFLE_RES),
            'grenade': (GRENADE_IMG, GRENADE_RES),
