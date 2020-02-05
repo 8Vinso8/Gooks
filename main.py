@@ -310,6 +310,7 @@ class Gook(Thing):
         self.hp = 100
         self.angle = 0
         self.move_img_delay = 0
+        self.holding = False
 
     def __str__(self):
         return self.name
@@ -321,12 +322,24 @@ class Gook(Thing):
         name_text = font.render(self.name, True, pygame.Color(self.color))
         window.blit(hp_text, [self.position[0], self.position[1] - 10])
         window.blit(name_text, [self.position[0], self.position[1] - 20])
+        if self.holding:
+            time = pygame.time.get_ticks() - self.start_ticks
+            if time > 2700:
+                time = 2700
+            power = time / 2700
+            pygame.draw.rect(window, (round(255 * power), round(255 * (1 - power)), 0),
+                             pygame.Rect((self.position[0] + 1, self.position[1]), (self.size[0] * power - 1, 10)))
 
     def get_weapon(self):
         return self.weapon
 
     def get_hp(self):
         return self.hp
+
+    def change_holding_status(self):
+        self.holding = not self.holding
+        if self.holding:
+            self.start_ticks = pygame.time.get_ticks()
 
     def key_move(self, move):
         last_direction = self.direction
@@ -571,6 +584,7 @@ def main():
                     places_for_filling.append(((jump_last_pos[0], jump_last_pos[1] - 30), cur_gook.get_size()))
 
             if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN:
+                cur_gook.change_holding_status()
                 start_ticks = pygame.time.get_ticks()
                 is_mouse_down = True
                 cur_gook.change_image_state(SHOOT_FORWARD_IMG)
@@ -583,6 +597,7 @@ def main():
                     cur_gook.change_image_state(SHOOT_UP_IMG)
                     cur_gook.change_size(SHOOT_UP_RES)
             if is_mouse_down and event.type == MOUSEBUTTONUP:
+                cur_gook.change_holding_status()
                 time = pygame.time.get_ticks() - start_ticks
                 if time > 2700:
                     time = 2700
@@ -591,6 +606,7 @@ def main():
                 is_mouse_down = False
                 cur_gook.change_image_state(GOOK_IMG)
                 cur_gook.change_size(GOOK_RES)
+                places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
 
         if not is_jumped:
             keys = pygame.key.get_pressed()
