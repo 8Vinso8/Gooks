@@ -7,6 +7,7 @@ from team import Team
 from functions import *
 from locals import *
 from interface import *
+from box import Medicine
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)  # frequency, size, channels, buffersize
 pygame.init()
@@ -75,6 +76,12 @@ def main():
     for team in teams:
         for gook in team.get_gooks():
             gook.draw(window)
+            
+    boxes = list(Medicine(map1, pos, HEALTH_BOX_IMG, HEALTH_BOX_RES)
+                 for pos in HEALTH_BOX_POSITIONS)
+    for box in boxes:
+        box.draw(window)
+        
     sounds['soundtrack'].play(-1)
     while is_working:
         cur_gook.is_weapon = True
@@ -147,6 +154,14 @@ def main():
                 were_walking = True
         if cur_gook.collision('down'):
             is_jumped = False
+            
+        for box in boxes:
+            box_last_pos = box.passive_move()
+            if box_last_pos:
+                places_for_filling.append((box.get_pos(), box.get_size()))
+            if box.check_state():
+                boxes.remove(box)
+                places_for_filling.append((box.get_pos(), box.get_size()))
 
         for graveyard in graveyards:
             graveyard_last_pos = graveyard.passive_move()
@@ -182,6 +197,11 @@ def main():
         for team in teams:
             for gook in team.get_gooks():
                 last_pos_or_none = gook.passive_move()
+                for box in boxes:
+                    if gook.get_rect().colliderect(box.get_rect()):
+                        gook.make_damage(-box.get_heal_number())
+                        places_for_filling.append((box.get_pos(), box.get_size()))
+                        boxes.remove(box)
                 if last_pos_or_none:
                     places_for_filling.append((last_pos_or_none, gook.get_size()))
                 if gook.check_state():
@@ -214,6 +234,8 @@ def main():
             map1.draw_part(window, place, size)
         places_for_filling.clear()
 
+        for box in boxes:
+            box.draw(window)
         for graveyard in graveyards:
             graveyard.draw(window)
         for bullet in bullets:
