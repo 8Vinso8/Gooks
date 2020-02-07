@@ -50,7 +50,7 @@ CHARGE_BAR_IMGS = {
 }
 HEALTH_BOX_IMG = 'health_box.png'
 HEALTH_BOX_RES = (26, 24)
-HEALTH_BOX_POSITIONS = [(100, 10)]
+HEALTH_BOX_POSITIONS = [(100, 100), (1000, 100), (200, 500)]
 
 CANNON_PROJ_IMG = 'cannon_proj.png'
 CANNON_PROJ_RES = (30, 14)
@@ -85,9 +85,9 @@ PROJECTILES = {'cannon': (CANNON_PROJ_IMG, CANNON_PROJ_RES, 0.25, 20, 150, 30),
 WEAPONS = {'cannon': (CANNON_IMG, CANNON_RES),
            'rifle': (RIFLE_IMG, RIFLE_RES)}
 
-TEAMS = [['BTS', 'blue', [(100, 0)], ('ChiMin',)],
-         ['CHUCHE', 'red', [(600, 0)], ('KimChenIn',)],
-         ['ANIME', 'white', [(1100, 0)], ('Hidetaka',)]]
+TEAMS = [['BTS', 'blue', [(50, 0)], ('ChiMin',)],
+         ['CHUCHE', 'red', [(600, 0)], ('MaoJeDun',)]]
+         # ['ANIME', 'white', [(1100, 0)], ('Hidetaka',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
 FPS = 30
