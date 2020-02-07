@@ -24,6 +24,7 @@ sounds = {
                     pygame.mixer.Sound(os.path.join('data', gook_sounds[2])))
 }
 
+
 for i in sounds['turn_sounds']:
     i.set_volume(2)
 
@@ -60,7 +61,7 @@ def main():
 
     window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
     pygame.display.set_caption('Gooks')
-    
+
     wind_indicator = WindIndicator((0, 0))
 
     clock = pygame.time.Clock()
@@ -104,12 +105,12 @@ def main():
                 if event.key == K_SPACE:
                     is_jumped = True
                     jump_last_pos = cur_gook.jump1()
-                    places_for_filling.append((jump_last_pos, cur_gook.get_size()))
+                    places_for_filling.append(cur_gook.get_place_for_filling(jump_last_pos, cur_gook.get_size()))
 
                 if event.key == K_RETURN:
                     is_jumped = True
                     jump_last_pos = cur_gook.jump2()
-                    places_for_filling.append((jump_last_pos, cur_gook.get_size()))
+                    places_for_filling.append(cur_gook.get_place_for_filling(jump_last_pos, cur_gook.get_size()))
 
             if not bullets and not is_mouse_down and event.type == MOUSEBUTTONDOWN and event.button == 1:
                 cur_gook.change_holding_status()
@@ -138,7 +139,7 @@ def main():
                 is_mouse_down = False
                 cur_gook.change_image_state(GOOK_IMG)
                 cur_gook.change_size(GOOK_RES)
-                places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
+                places_for_filling.append(cur_gook.get_place_for_filling(cur_gook.get_pos(), cur_gook.get_size()))
                 playing_sounds.append(sounds['shot_sound'])
 
             if not is_mouse_down and event.type == MOUSEBUTTONUP and event.button == 3:
@@ -149,11 +150,11 @@ def main():
             keys = pygame.key.get_pressed()
             if keys[K_a]:
                 key_move_last_pos = cur_gook.key_move('A')
-                places_for_filling.append((key_move_last_pos, cur_gook.get_size()))
+                places_for_filling.append((cur_gook.get_place_for_filling(key_move_last_pos, cur_gook.get_size())))
                 were_walking = True
             if keys[K_d]:
                 key_move_last_pos = cur_gook.key_move('D')
-                places_for_filling.append((key_move_last_pos, cur_gook.get_size()))
+                places_for_filling.append((cur_gook.get_place_for_filling(key_move_last_pos, cur_gook.get_size())))
                 were_walking = True
         if cur_gook.collision('down'):
             is_jumped = False
@@ -206,12 +207,12 @@ def main():
                         places_for_filling.append((box.get_pos(), box.get_size()))
                         boxes.remove(box)
                 if last_pos_or_none:
-                    places_for_filling.append((last_pos_or_none, gook.get_size()))
+                    places_for_filling.append((gook.get_place_for_filling(last_pos_or_none, gook.get_size())))
                 if gook.check_state():
                     if gook == cur_gook:
                         next_turn()
                     graveyards.append(gook.make_graveyard())
-                    places_for_filling.append((gook.get_pos(), gook.get_size()))
+                    places_for_filling.append(gook.get_place_for_filling(gook.get_pos(), gook.get_size()))
                     team.remove_gook(gook)
                     playing_sounds.append(sounds['death_sound'])
                 places_for_filling.append((gook.get_weapon().get_pos(), gook.get_weapon().get_size()))
@@ -221,7 +222,7 @@ def main():
                 if len(teams) == 1:
                     sounds['victory_sound'].play()
                     win_screen(window, clock, teams[0])
-        places_for_filling.append(((910, 10), (30, 50)))
+        places_for_filling.append(((910, 10), (50, 50)))
 
         for explosion in explosions:
             if explosion.check_state():
@@ -232,6 +233,8 @@ def main():
             cur_gook.change_move_image()
         elif cur_gook.get_image_name() != SHOOT_FORWARD_IMG and cur_gook.get_image_name() != SHOOT_UP_IMG:
             cur_gook.change_image_state(GOOK_IMG)
+            if cur_gook.get_place_for_filling(cur_gook.get_pos(), cur_gook.get_size()) not in places_for_filling:
+                places_for_filling.append(cur_gook.get_place_for_filling(cur_gook.get_pos(), cur_gook.get_size()))
 
         for place, size in places_for_filling:
             map1.draw_part(window, place, size)
