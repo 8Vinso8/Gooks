@@ -228,7 +228,6 @@ def main():
             cur_gook.change_move_image()
         elif cur_gook.get_image_name() != SHOOT_FORWARD_IMG and cur_gook.get_image_name() != SHOOT_UP_IMG:
             cur_gook.change_image_state(GOOK_IMG)
-        places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
 
         for place, size in places_for_filling:
             map1.draw_part(window, place, size)
