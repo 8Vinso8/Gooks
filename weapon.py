@@ -13,9 +13,9 @@ class Weapon(Thing):
         self.angle = degrees(angle_rad)
         '''self.rotate(self.angle)'''
 
-    '''def rotate(self, angle):
+    def rotate(self, angle):
         if self.direction == 'right':
-            self.image = pygame.transform.rotate(self.image, angle - self.angle)'''
+            self.image = pygame.transform.rotate(self.image, angle - self.angle)
 
     def set_pos(self, position):
         self.position = (position[0] + GOOK_RES[0] // 2 - self.size[0] // 2,

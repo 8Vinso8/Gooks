@@ -7,6 +7,8 @@ from team import Team
 from functions import *
 from locals import *
 from interface import *
+import itertools
+import random
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)  # frequency, size, channels, buffersize
 pygame.init()
@@ -122,9 +124,9 @@ def main():
             if is_mouse_down and event.type == MOUSEBUTTONUP and event.button == 1:
                 cur_gook.change_holding_status()
                 time = pygame.time.get_ticks() - start_ticks
-                if time > 2700:
-                    time = 2700
-                power = time / 3000 + 0.1
+                if time > 1800:
+                    time = 1800
+                power = time / 2000 + 0.1
                 bullets.append(cur_gook.shoot(event.pos, power))
                 is_mouse_down = False
                 cur_gook.change_image_state(GOOK_IMG)
@@ -133,6 +135,7 @@ def main():
                 playing_sounds.append(sounds['shot_sound'])
 
             if not is_mouse_down and event.type == MOUSEBUTTONUP and event.button == 3:
+                places_for_filling.append((cur_gook.get_weapon().get_pos(), cur_gook.get_weapon().get_size()))
                 cur_gook.change_weapon()
 
         if not bullets and not is_mouse_down and not is_jumped:
@@ -191,6 +194,7 @@ def main():
                     places_for_filling.append((gook.get_pos(), gook.get_size()))
                     team.remove_gook(gook)
                     playing_sounds.append(sounds['death_sound'])
+                places_for_filling.append((gook.get_weapon().get_pos(), gook.get_weapon().get_size()))
                 gook.get_weapon().set_pos(gook.get_pos())
             if not team.check_state():
                 teams.remove(team)

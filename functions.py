@@ -1,9 +1,6 @@
 import pygame
 import sys
 import os
-import itertools
-from locals import *
-import random
 
 
 def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name, wind_indicator):

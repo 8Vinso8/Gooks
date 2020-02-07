@@ -2,7 +2,7 @@ import pygame
 from thing import Thing
 import math
 from locals import *
-from graveyard import Graveyard
+from gravestone import Gravestone
 from bullet import Bullet
 from weapon import Weapon
 import itertools
@@ -22,9 +22,9 @@ class Gook(Thing):
         self.move_img_delay = 0
         self.is_weapon = False
         self.holding = False
-        self.weapon_name = weapon
         self.weapon = Weapon(bitmap, position, *WEAPONS[weapon], self.direction, self.angle)
         self.weapon_gen = itertools.cycle(self.get_next_weapon())
+        self.weapon_name = next(self.weapon_gen)
 
     def __str__(self):
         return self.name
@@ -35,14 +35,14 @@ class Gook(Thing):
         hp_text = font.render(str(self.get_hp()), True, pygame.Color('green'))
         name_text = font.render(self.name, True, pygame.Color(self.color))
         window.blit(hp_text, [self.position[0], self.position[1] - 10])
-        window.blit(name_text, [self.position[0], self.position[1] - 20])
+        window.blit(name_text, [self.position[0], self.position[1] - 25])
         if self.is_weapon:
             self.weapon.draw(window)
         if self.holding:
             time = pygame.time.get_ticks() - self.start_ticks
-            if time > 2700:
-                time = 2700
-            power = time / 2700
+            if time > 1800:
+                time = 1800
+            power = time / 2000 + 0.1
             pygame.draw.rect(window, (round(255 * power), round(255 * (1 - power)), 0),
                              pygame.Rect((self.position[0] + 1, self.position[1]), (self.size[0] * power - 1, 10)))
 
@@ -169,4 +169,4 @@ class Gook(Thing):
         return self.get_hp() > 0
 
     def make_graveyard(self):
-        return Graveyard(self.bitmap, self.get_pos(), GRAVEYARD_IMG, GRAVEYARD_RES)
+        return Gravestone(self.bitmap, self.get_pos(), GRAVESTONE_IMG, GRAVESTONE_RES)
