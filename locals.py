@@ -48,6 +48,10 @@ CHARGE_BAR_IMGS = {
     11: 'chargebar11.png',
     12: 'chargebar12.png'
 }
+HEALTH_BOX_IMG = 'health_box.png'
+HEALTH_BOX_RES = (26, 24)
+HEALTH_BOX_POSITIONS = [(100, 10)]
+
 CANNON_PROJ_IMG = 'cannon_proj.png'
 CANNON_PROJ_RES = (30, 14)
 RIFLE_PROJ_IMG = 'rifle_proj.png'

@@ -7,6 +7,7 @@ from team import Team
 from functions import *
 from locals import *
 from interface import *
+from box import Medicine
 import itertools
 import random
 
@@ -77,6 +78,12 @@ def main():
     for team in teams:
         for gook in team.get_gooks():
             gook.draw(window)
+
+    boxes = list(Medicine(map1, pos, HEALTH_BOX_IMG, HEALTH_BOX_RES)
+                 for pos in HEALTH_BOX_POSITIONS)
+    for box in boxes:
+        box.draw(window)
+
     sounds['soundtrack'].play(-1)
     while is_working:
         cur_gook.is_weapon = True
@@ -151,6 +158,14 @@ def main():
         if cur_gook.collision('down'):
             is_jumped = False
 
+        for box in boxes:
+            box_last_pos = box.passive_move()
+            if box_last_pos:
+                places_for_filling.append((box.get_pos(), box.get_size()))
+            if box.check_state():
+                boxes.remove(box)
+                places_for_filling.append((box.get_pos(), box.get_size()))
+
         for graveyard in graveyards:
             graveyard_last_pos = graveyard.passive_move()
             if graveyard_last_pos:
@@ -185,6 +200,11 @@ def main():
         for team in teams:
             for gook in team.get_gooks():
                 last_pos_or_none = gook.passive_move()
+                for box in boxes:
+                    if gook.get_rect().colliderect(box.get_rect()):
+                        gook.make_damage(-box.get_heal_number())
+                        places_for_filling.append((box.get_pos(), box.get_size()))
+                        boxes.remove(box)
                 if last_pos_or_none:
                     places_for_filling.append((last_pos_or_none, gook.get_size()))
                 if gook.check_state():
@@ -212,12 +232,13 @@ def main():
             cur_gook.change_move_image()
         elif cur_gook.get_image_name() != SHOOT_FORWARD_IMG and cur_gook.get_image_name() != SHOOT_UP_IMG:
             cur_gook.change_image_state(GOOK_IMG)
-        places_for_filling.append((cur_gook.get_pos(), cur_gook.get_size()))
 
         for place, size in places_for_filling:
             map1.draw_part(window, place, size)
         places_for_filling.clear()
 
+        for box in boxes:
+            box.draw(window)
         for graveyard in graveyards:
             graveyard.draw(window)
         for bullet in bullets:
