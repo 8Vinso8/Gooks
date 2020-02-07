@@ -56,6 +56,10 @@ class Gook(Thing):
         for weapon_now in WEAPONS:
             yield weapon_now
 
+    def get_place_for_filling(self, pos, res):
+        return ((pos[0], pos[1] - 20),
+                (res[0] + 30, res[1] + 20))
+
     def change_holding_status(self):
         self.holding = not self.holding
         if self.holding:
@@ -109,6 +113,7 @@ class Gook(Thing):
     def jump1(self):
         last_pos = self.get_pos()
         if self.collision('down'):
+            self.move(-10, -20)
             if self.direction == 'left':
                 self.change_speed((10, -20))
             else:
@@ -118,6 +123,7 @@ class Gook(Thing):
     def jump2(self):
         last_pos = self.get_pos()
         if self.collision('down'):
+            self.move(15, -15)
             if self.direction == 'left':
                 self.change_speed((-20, -15))
             else:
