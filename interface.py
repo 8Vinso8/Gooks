@@ -5,7 +5,7 @@ from locals import *
 class InterfaceThing:
     def __init__(self, position, image, size):
         self.position = position
-        self.image = image
+        self.image = load_image(image)
         self.size = size
         self.rect = self.image.get_rect(
             bottomright=(self.get_pos()[0] + self.get_size()[0],
@@ -32,8 +32,8 @@ class WindIndicator(InterfaceThing):
     def __init__(self, position):
         super().__init__(position, WIND_IMGS[0], WIND_RES)
         self.winds = dict()
-        for key, wind_img in WIND_IMGS:
-            self.winds[key] = load_image(wind_img, -1)
+        for key in WIND_IMGS:
+            self.winds[key] = load_image(WIND_IMGS[key], -1)
 
     def get_image(self, wind_num=0):
         return self.winds[wind_num]

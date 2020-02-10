@@ -1,4 +1,5 @@
 from functions import *
+from locals import G, RESOLUTION
 
 
 class Thing:

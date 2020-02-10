@@ -8,6 +8,7 @@ from functions import *
 from locals import *
 from interface import *
 from box import Medicine
+from particle import *
 import itertools
 import random
 
@@ -61,6 +62,11 @@ def main():
 
     window: pygame.Surface = pygame.display.set_mode(RESOLUTION, FULLSCREEN)
     pygame.display.set_caption('Gooks')
+
+    leave = load_image("leave.png", colorkey=(255, 255, 255))
+    leaves_images = [leave, pygame.transform.flip(leave, 1, 0)]
+    all_sprites = pygame.sprite.Group()
+    screen_rect = (0, 0, 1920, 1080)
 
     wind_indicator = WindIndicator((0, 0))
 
@@ -235,6 +241,11 @@ def main():
             cur_gook.change_image_state(GOOK_IMG)
             if cur_gook.get_place_for_filling(cur_gook.get_pos(), cur_gook.get_size()) not in places_for_filling:
                 places_for_filling.append(cur_gook.get_place_for_filling(cur_gook.get_pos(), cur_gook.get_size()))
+
+        all_sprites.update(wind, places_for_filling)
+        all_sprites.draw(window)
+        if len(all_sprites.sprites()) < 10 and choice((True, False)):
+            create_particle(wind, all_sprites, leaves_images, screen_rect)
 
         for place, size in places_for_filling:
             map1.draw_part(window, place, size)
