@@ -17,14 +17,14 @@ class Particle(pygame.sprite.Sprite):
         else:
             self.image = self.images[1]
         self.rect = self.image.get_rect()
-        self.x_speed = wind
+        self.x_speed = wind // 2
         self.y_speed = 0
         self.rect.x, self.rect.y = pos
         self.res = (18, 10)
 
     def update(self, wind, places_to_fill):
         places_to_fill.append(((self.rect.x, self.rect.y), self.res))
-        self.x_speed += wind
+        self.x_speed += wind // 2
         self.y_speed += G
         if copysign(1, wind) != copysign(1, self.prev_wind):
             if wind >= 0:
@@ -33,6 +33,7 @@ class Particle(pygame.sprite.Sprite):
                 self.image = self.images[1]
         self.rect.x += self.x_speed
         self.rect.y += self.y_speed
+        self.prev_wind = wind
         if not self.rect.colliderect(self.screen_rect):
             self.kill()
 
