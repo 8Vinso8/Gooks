@@ -90,7 +90,7 @@ TEAMS = [['BTS', 'blue', [(50, 0)], ('ChiMin',)],
          # ['ANIME', 'white', [(1100, 0)], ('Hidetaka',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
-FPS = 30
+FPS = 45
 
 G = 1
 wind = 0

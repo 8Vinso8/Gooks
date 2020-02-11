@@ -24,8 +24,8 @@ class Particle(pygame.sprite.Sprite):
 
     def update(self, wind, places_to_fill):
         places_to_fill.append(((self.rect.x, self.rect.y), self.res))
-        self.x_speed += wind // 2
-        self.y_speed += G
+        self.x_speed += wind / 16
+        self.y_speed += G / 6
         if copysign(1, wind) != copysign(1, self.prev_wind):
             if wind >= 0:
                 self.image = self.images[0]

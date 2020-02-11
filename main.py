@@ -14,7 +14,7 @@ import random
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)  # frequency, size, channels, buffersize
 pygame.init()
-sounds = {
+'''sounds = {
     'soundtrack': pygame.mixer.Sound(os.path.join('data', soundtrack_way)),
     'death_sound': pygame.mixer.Sound(os.path.join('data', death_sound_way)),
     'shot_sound': pygame.mixer.Sound(os.path.join('data', shot_sound_way)),
@@ -27,7 +27,7 @@ sounds = {
 
 
 for i in sounds['turn_sounds']:
-    i.set_volume(2)
+    i.set_volume(2)'''
 
 
 def get_next_team():
@@ -91,7 +91,7 @@ def main():
     for box in boxes:
         box.draw(window)
 
-    sounds['soundtrack'].play(-1)
+    # sounds['soundtrack'].play(-1)
     while is_working:
         cur_gook.is_weapon = True
         timer_fps = pygame.time.get_ticks()
@@ -146,7 +146,7 @@ def main():
                 cur_gook.change_image_state(GOOK_IMG)
                 cur_gook.change_size(GOOK_RES)
                 places_for_filling.append(cur_gook.get_place_for_filling(cur_gook.get_pos(), cur_gook.get_size()))
-                playing_sounds.append(sounds['shot_sound'])
+                # playing_sounds.append(sounds['shot_sound'])
 
             if not is_mouse_down and event.type == MOUSEBUTTONUP and event.button == 3:
                 places_for_filling.append((cur_gook.get_weapon().get_pos(), cur_gook.get_weapon().get_size()))
@@ -192,14 +192,14 @@ def main():
                     for gook in team.get_gooks():
                         if gook.get_rect().colliderect(boom_rect):
                             gook.make_damage(bullet.get_dmg())
-                playing_sounds.append(sounds['explode_sound'])
+                # playing_sounds.append(sounds['explode_sound'])
 
             if state:
                 bullets.remove(bullet)
                 cur_gook.is_weapon = False
                 next_turn()
-                if random.randint(0, 2) == 2:
-                    playing_sounds.append(random.choice(sounds['turn_sounds']))
+                # if random.randint(0, 2) == 2:
+                #    playing_sounds.append(random.choice(sounds['turn_sounds']))
                 places_for_filling.append(((0, 10), (30, 50)))
                 places_for_filling.append(((1700, 10), (175, 100)))
             places_for_filling.append((bullet_last_pos, bullet.get_size()))
@@ -220,13 +220,13 @@ def main():
                     graveyards.append(gook.make_graveyard())
                     places_for_filling.append(gook.get_place_for_filling(gook.get_pos(), gook.get_size()))
                     team.remove_gook(gook)
-                    playing_sounds.append(sounds['death_sound'])
+                    # playing_sounds.append(sounds['death_sound'])
                 places_for_filling.append((gook.get_weapon().get_pos(), gook.get_weapon().get_size()))
                 gook.get_weapon().set_pos(gook.get_pos())
             if not team.check_state():
                 teams.remove(team)
                 if len(teams) == 1:
-                    sounds['victory_sound'].play()
+                    # sounds['victory_sound'].play()
                     win_screen(window, clock, teams[0])
         places_for_filling.append(((910, 10), (50, 50)))
 
@@ -244,7 +244,7 @@ def main():
 
         all_sprites.update(wind, places_for_filling)
         all_sprites.draw(window)
-        if len(all_sprites.sprites()) < 10 and choice((True, False)):
+        if len(all_sprites.sprites()) < 30 and randint(0, 4) == 4:
             create_particle(wind, all_sprites, leaves_images, screen_rect)
 
         for place, size in places_for_filling:
