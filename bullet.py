@@ -17,6 +17,7 @@ class Bullet(Thing):
         self.explosion = PROJECTILES[weapon][4]
         self.dmg = PROJECTILES[weapon][5]
         self.direction = direction
+        self.timer = pygame.time.get_ticks()
 
     def move(self):
         last_pos = self.get_pos()
@@ -27,20 +28,20 @@ class Bullet(Thing):
     def get_dmg(self):
         return self.dmg
 
-    def check_state(self, teams):
+    def check_state(self, teams, cur_gook):
         if super().check_state():
             return super().check_state()
         if self.collision('left', self.x_speed) or self.collision('right', self.x_speed) \
                 or self.collision('down', self.y_speed) or self.collision('up', self.y_speed):
             return 'BOOM'
-        '''for team in teams:
+        for team in teams:
             for gook in team.get_gooks():
                 if pygame.Rect(
                         gook.get_pos(), gook.get_size()
                 ).colliderect(
                         pygame.Rect(self.get_pos(), self.get_size())
-                ):
-                    return 'BOOM'''
+                ) and gook != cur_gook:
+                    return 'BOOM'
         # Проверка столкновения
 
     def boom(self, window):

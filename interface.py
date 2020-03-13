@@ -7,10 +7,6 @@ class InterfaceThing:
         self.position = position
         self.image = load_image(image)
         self.size = size
-        self.rect = self.image.get_rect(
-            bottomright=(self.get_pos()[0] + self.get_size()[0],
-                         self.get_pos()[1] + self.get_size()[1])
-        )
 
     def get_image(self):
         return self.image
@@ -21,11 +17,12 @@ class InterfaceThing:
     def get_size(self):
         return self.size
 
-    def get_rect(self):
-        return self.rect
-
     def draw(self, window):
-        window.blit(self.get_image(), self.get_rect())
+        self.rect = self.image.get_rect(
+            bottomright=(self.get_pos()[0] + self.get_size()[0],
+                         self.get_pos()[1] + self.get_size()[1])
+        )
+        window.blit(self.get_image(), self.rect)
 
 
 class WindIndicator(InterfaceThing):
@@ -39,27 +36,39 @@ class WindIndicator(InterfaceThing):
         return self.winds[wind_num]
 
     def draw(self, window, wind_num=0):
-        window.blit(self.get_image(wind_num), self.get_rect())
+        self.rect = self.image.get_rect(
+            bottomright=(self.get_pos()[0] + self.get_size()[0],
+                         self.get_pos()[1] + self.get_size()[1])
+        )
+        window.blit(self.get_image(wind_num), self.rect)
 
 
 class ChargeBar(InterfaceThing):
     def __init__(self, position):
-        super().__init__(position, CHARGE_BAR_IMG, CHARGE_BAR_RES)
-        self.positive_wind = list()
-        self.negative_wind = list()
-        self.zero_wind = load_image('windbox.png', -1)
-        for i in range(1, 6):
-            self.positive_wind.append(load_image(f'windbox{str(i)}.png'))
-        for j in range(1, 6):
-            self.negative_wind.append(load_image(f'windbox{str(j * -1)}.png'))
+        super().__init__(position, CHARGE_BAR_IMGS[0], CHARGE_BAR_RES)
+        self.next_time = 1/12
+        self.n_image = 0
+        self.timer = pygame.time.get_ticks()
+        self.is_charging = False
 
-    def get_image(self, wind_num):
-        if not wind_num:
-            return self.zero_wind
-        elif wind_num > 0:
-            return self.positive_wind[wind_num - 1]
-        else:
-            return self.negative_wind[wind_num * -1 - 1]
+    def draw(self, window):
+        if self.is_charging:
+            self.change_image()
+        super().draw(window)
 
-    def get_pos(self):
-        return self.position
+    def change_image(self):
+        if pygame.time.get_ticks() - self.timer > self.next_time * 2000:
+            self.next_time += 1/12
+            if self.n_image < 12:
+                self.n_image += 1
+            self.image = load_image(CHARGE_BAR_IMGS[self.n_image], -1)
+
+    def start_charge(self):
+        self.timer = pygame.time.get_ticks()
+        self.is_charging = True
+
+    def stop_charge(self):
+        self.is_charging = False
+        self.next_time = 1 / 12
+        self.n_image = 0
+        self.image = load_image(CHARGE_BAR_IMGS[0])

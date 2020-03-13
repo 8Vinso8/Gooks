@@ -38,16 +38,12 @@ class Gook(Thing):
         window.blit(name_text, [self.position[0], self.position[1] - 25])
         if self.is_weapon:
             self.weapon.draw(window)
-        if self.holding:
-            time = pygame.time.get_ticks() - self.start_ticks
-            if time > 1800:
-                time = 1800
-            power = time / 2000 + 0.1
-            pygame.draw.rect(window, (round(255 * power), round(255 * (1 - power)), 0),
-                             pygame.Rect((self.position[0] + 1, self.position[1]), (self.size[0] * power - 1, 10)))
 
     def get_weapon(self):
         return self.weapon
+
+    def get_weapon_name(self):
+        return self.weapon_name
 
     def get_hp(self):
         return self.hp
@@ -59,11 +55,6 @@ class Gook(Thing):
     def get_place_for_filling(self, pos, res):
         return ((pos[0], pos[1] - 20),
                 (res[0] + 30, res[1] + 20))
-
-    def change_holding_status(self):
-        self.holding = not self.holding
-        if self.holding:
-            self.start_ticks = pygame.time.get_ticks()
 
     def change_direction(self, direction):
         if self.direction != direction:
@@ -138,8 +129,7 @@ class Gook(Thing):
         return self.angle
 
     def shoot(self, final_cords, power):
-        print(self.change_get_angle(final_cords))
-
+        self.change_get_angle(final_cords)
         return Bullet(
             self.bitmap,
             (self.get_x() + self.get_size()[0] // 2, self.get_y() + self.get_size()[1] // 2),

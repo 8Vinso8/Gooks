@@ -48,6 +48,7 @@ CHARGE_BAR_IMGS = {
     11: 'chargebar11.png',
     12: 'chargebar12.png'
 }
+CHARGE_BAR_RES = (40, 212)
 HEALTH_BOX_IMG = 'health_box.png'
 HEALTH_BOX_RES = (26, 24)
 HEALTH_BOX_POSITIONS = [(100, 100), (1000, 100), (200, 500)]
@@ -90,7 +91,8 @@ TEAMS = [['BTS', 'blue', [(50, 0)], ('ChiMin',)],
          # ['ANIME', 'white', [(1100, 0)], ('Hidetaka',)]]
 TEAM_LEN = len(TEAMS[0][3])
 
-FPS = 45
+FPS = 30
+TIMER = 15000
 
 G = 1
 wind = 0

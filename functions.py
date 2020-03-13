@@ -3,15 +3,14 @@ import sys
 import os
 
 
-def draw_interface(window, wind_num, fps, cur_team_name, cur_gook_name, wind_indicator):
+def draw_interface(window, timer, cur_team_name, cur_gook_name):
     font = pygame.font.Font(None, 50)
-    fps_text = font.render(str(fps), True, pygame.Color('white'))
+    timer_text = font.render(str(timer), True, pygame.Color('white'))
     cur_team_text = font.render(str(cur_team_name), True, pygame.Color('white'))
     cur_gook_text = font.render(str(cur_gook_name), True, pygame.Color('white'))
-    window.blit(fps_text, [910, 10])
+    window.blit(timer_text, [910, 10])
     window.blit(cur_team_text, [1700, 10])
     window.blit(cur_gook_text, [1700, 40])
-    window.blit(wind_indicator.get_image(wind_num), wind_indicator.get_pos())
 
 
 def terminate():
